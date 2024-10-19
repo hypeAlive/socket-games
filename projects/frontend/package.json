@@ -6,20 +6,22 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "generate:nginx-config": "node generate-nginx-conf.js"
   },
   "private": true,
   "dependencies": {
-    "socket-game-types": "../types",
     "@angular/animations": "^18.2.0",
     "@angular/common": "^18.2.0",
     "@angular/compiler": "^18.2.0",
     "@angular/core": "^18.2.0",
     "@angular/forms": "^18.2.0",
+    "@angular/localize": "^18.2.8",
     "@angular/platform-browser": "^18.2.0",
     "@angular/platform-browser-dynamic": "^18.2.0",
     "@angular/router": "^18.2.0",
     "rxjs": "~7.8.0",
+    "socket-game-types": "../types",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.10"
   },

@@ -1,14 +1,15 @@
-FROM node:18.0.0-alpine AS build
+FROM node:18.20.2-alpine AS build
 
 RUN apk add --no-cache git
 
-#install types
+# install types
 COPY /types/ /app/types/
 
 WORKDIR /app/types
 RUN npm i
 RUN npm run build
 
+# install socket server
 WORKDIR /app/server
 COPY /server/package.json /app/server
 RUN npm i

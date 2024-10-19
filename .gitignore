@@ -1,5 +1,6 @@
 **/dist
 **/node_modules
 .idea
+/projects/frontend/.angular
 .vscode
 **/package-lock.json
