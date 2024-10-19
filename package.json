@@ -1,0 +1,21 @@
+{
+  "name": "socket-game",
+  "version": "1.0.0",
+  "main": "index.js",
+  "workspaces": [
+    "projects/frontend",
+    "projects/types",
+    "projects/server"
+  ],
+  "scripts": {
+    "setup": "npm install --workspaces",
+    "test": "npm run test --workspaces",
+    "build": "npm run build --workspaces",
+    "start": "npm run build && npm start --workspace=projects/server",
+    "update": "npm prune && npm update --workspaces",
+    "ci": "npm run setup && npm run update && npm run build && npm run test"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

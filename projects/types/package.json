@@ -1,0 +1,21 @@
+{
+  "name": "socket-game-types",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/src/main.js",
+  "types": "dist/src/main.d.ts",
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "test": "",
+    "update": "npm prune && npm update"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "typescript": "^5.5.3",
+    "rimraf": "^5.0.8"
+  },
+  "description": ""
+}

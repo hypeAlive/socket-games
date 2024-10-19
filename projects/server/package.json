@@ -1,0 +1,33 @@
+{
+  "name": "socket-game-server",
+  "version": "1.0.0",
+  "type": "module",
+  "types": "dist/src/main/main.d.ts",
+  "main": "dist/src/main/main.js",
+  "scripts": {
+    "test": "mocha './dist/src/test/**/*.js'",
+    "build": "rimraf dist && tsc",
+    "start": "node dist/src/main/main.js",
+    "update": "npm prune && npm update"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "socket-game-types": "../types",
+    "ts-optional": "github:hypeAlive/ts-optional",
+    "rxjs": "^7.8.1",
+    "socket.io": "^4.7.5",
+    "winston": "^3.13.1"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.1",
+    "@types/mocha": "^9.1.1",
+    "@types/sinon": "^10.0.12",
+    "chai": "^4.3.6",
+    "mocha": "^10.0.0",
+    "rimraf": "^5.0.8",
+    "sinon": "^14.0.0",
+    "typescript": "^5.5.3"
+  },
+  "description": ""
+}
