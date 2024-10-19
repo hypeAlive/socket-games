@@ -10,12 +10,15 @@
   "scripts": {
     "setup": "npm install --workspaces",
     "test": "npm run test --workspaces",
-    "build": "npm run build --workspaces",
-    "start": "npm run build && npm start --workspace=projects/server",
+    "build": "npm run build --workspace=projects/types --workspace=projects/server",
+    "start": "npm run build && concurrently \"npm start --workspace=projects/server\" \"npm start --workspace=projects/frontend\"",
     "update": "npm prune && npm update --workspaces",
     "ci": "npm run setup && npm run update && npm run build && npm run test"
   },
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
 }
