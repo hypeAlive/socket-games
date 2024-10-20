@@ -1,4 +1,4 @@
-name: master release
+name: dev preview
 
 on:
   push:
@@ -10,7 +10,6 @@ on:
 
 permissions:
   contents: write
-  packages: write
   issues: write
   pull-requests: write
 
@@ -37,9 +36,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           VERSION_SPACES=$(npx semantic-release --dry-run | grep -oP 'Published release \K.*? ')
-          VERSION="${VERSION_SPACES// /}"  # Remove spaces
-          echo "GEN_VERSION=$VERSION" >> $GITHUB_ENV  # Set environment variable
-          echo "Version: $VERSION"  # Output for confirmation
+          VERSION="${VERSION_SPACES// /}"  # Entfernen von Leerzeichen
+          echo "GEN_VERSION=$VERSION" >> $GITHUB_ENV  # Setze die Umgebungsvariable
+          echo "Version: $VERSION"  # Ausgabe zur Bestätigung
 
       - name: Save version
         id: save-version
