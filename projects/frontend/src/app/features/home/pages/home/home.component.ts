@@ -10,7 +10,7 @@ import {NgForOf} from '@angular/common';
     NgForOf
   ],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.scss'
+  styles: []
 })
 export default class HomeComponent {
 

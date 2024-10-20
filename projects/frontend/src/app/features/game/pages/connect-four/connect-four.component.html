@@ -1,0 +1,14 @@
+<div class="container mx-auto py-12">
+  <div class="bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-10 max-w-2xl mx-auto mb-12">
+    <h2 class="text-3xl font-semibold mb-8 text-center text-gray-900 dark:text-white">Connect Four</h2>
+    <div class="grid grid-cols-7 gap-2">
+      <div *ngFor="let cell of board" class="w-16 h-16 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
+        <div [ngClass]="{
+          'bg-red-500': cell === 'R',
+          'bg-yellow-500': cell === 'Y',
+          'bg-transparent': cell === null
+        }" class="w-12 h-12 rounded-full"></div>
+      </div>
+    </div>
+  </div>
+</div>

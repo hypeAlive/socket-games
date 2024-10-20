@@ -8,7 +8,7 @@ import {NgForOf} from '@angular/common';
     NgForOf
   ],
   templateUrl: './card.component.html',
-  styleUrl: './card.component.scss'
+  styles: []
 })
 export class CardComponent {
 

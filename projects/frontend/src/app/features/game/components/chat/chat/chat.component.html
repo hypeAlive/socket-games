@@ -1,0 +1,51 @@
+<div [@slideInOut]="isChatOpen ? 'in' : 'out'" style="box-shadow: 0 0 #0000, 0 0 #0000, 0 1px 2px 0 rgb(0 0 0 / 0.05);"
+     class="fixed bottom-6 right-0 mr-4 bg-gray-800 p-6 rounded-2xl border border-gray-600 w-[440px] h-[634px] close"
+     #chatContainer>
+
+  <!-- Heading -->
+  <div class="flex justify-between pb-6">
+    <div class="flex flex-col">
+      <h2 class="font-semibold text-lg tracking-tight text-white">Chat</h2>
+      <p class="text-sm text-gray-400 leading-3">Please refrain from using offensive language.</p>
+    </div>
+    <button type="button"
+            class="text-blue-700 border border-blue-700 focus:ring-4
+        focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm p-2.5
+        text-center inline-flex items-center dark:border-blue-500 dark:text-blue-500 dark:focus:ring-blue-800
+        hover:bg-blue-700 hover:text-white dark:hover:text-white dark:hover:bg-blue-500"
+            (click)="toggleChat()">
+      <ng-icon class="text-2xl" [name]="!isChatOpen ? 'hugeBubbleChat' : 'hugeCancelCircle'"></ng-icon>
+      <span class="sr-only">Close Chat</span>
+    </button>
+  </div>
+
+  <!-- Chat Container -->
+  <div class="pr-4 h-[460px] overflow-y-auto flex flex-col gap-4 pb-4 [&::-webkit-scrollbar]:w-2
+  [&::-webkit-scrollbar-track]:bg-gray-100
+  [&::-webkit-scrollbar-thumb]:bg-gray-300
+  dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+  dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
+       #messageContainer>
+    <game-chat-message/>
+    <game-chat-message [isRightAligned]="true"/>
+    <game-chat-message/>
+    <game-chat-message [isRightAligned]="true"/>
+    <game-chat-message/>
+    <game-chat-message [isRightAligned]="true"/>
+    <game-chat-message/>
+  </div>
+
+  <game-chat-input/>
+</div>
+
+<!-- Open button at the bottom -->
+<button *ngIf="!isChatOpen" type="button"
+        class="fixed bottom-6 right-6 text-blue-700 border border-blue-700 focus:ring-4
+        focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm p-2.5
+        text-center inline-flex items-center dark:border-blue-500 dark:text-blue-500 dark:focus:ring-blue-800
+        hover:bg-blue-700 hover:text-white dark:hover:text-white dark:hover:bg-blue-500"
+        (click)="toggleChat()"
+        #openButton>
+  <ng-icon class="text-3xl" name="hugeBubbleChat"></ng-icon>
+  <span class="sr-only">Open Chat</span>
+</button>
