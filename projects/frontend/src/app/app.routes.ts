@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import errorRoutes from './features/error/error.routes';
 
 export const routes: Routes = [
   {
@@ -16,5 +17,6 @@ export const routes: Routes = [
   {
     path: 'game',
     loadChildren: () => import('./features/game/game.module'),
-  }
+  },
+  ...errorRoutes
 ];

@@ -18,7 +18,7 @@ COPY /frontend/*.json /frontend/*.js  /app/frontend/
 
 # build frontend
 WORKDIR /app/frontend
-RUN npm run build
+RUN npm run build:prod
 
 # gen nginx config
 RUN npm run generate:nginx-config
