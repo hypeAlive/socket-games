@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {NgIf} from '@angular/common';
 import {WindowComponent} from '../../components/window/window.component';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -20,13 +20,14 @@ export default class CreateComponent implements OnInit {
 
   protected createForm: FormGroup;
   private gameData!: CmsGame;
+  protected isLoading: boolean = false;
 
   constructor(private fb: FormBuilder, private router: Router, private route: ActivatedRoute) {
     this.route.data.subscribe(data => {
       this.gameData = data['game'];
     });
     this.createForm = this.fb.group({
-      username: [''],
+      username: ['', Validators.required],
       password: [''],
       setPassword: [false]
     });
@@ -37,7 +38,13 @@ export default class CreateComponent implements OnInit {
   }
 
   onSubmit() {
+    if(this.isLoading) return;
+    this.isLoading = true;
     console.log(this.createForm.value);
+    // Simulate an async operation
+    setTimeout(() => {
+      this.isLoading = false;
+    }, 2000);
   }
 
   ngOnInit(): void {

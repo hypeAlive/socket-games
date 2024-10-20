@@ -3,7 +3,6 @@ import {ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot} from '@ang
 import {NGXLogger} from "ngx-logger";
 import {DirectusService} from "../../../core/services/directus.service";
 import {CmsGame} from '../../home/models/games.interface';
-import {ErrorStatusCode} from '../../error/models/error-state';
 
 @Injectable({
   providedIn: 'root'
