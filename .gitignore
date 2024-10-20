@@ -3,4 +3,5 @@
 .idea
 /projects/frontend/.angular
 .vscode
-**/package-lock.json
+.secrets
+.variables

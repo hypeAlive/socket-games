@@ -19,6 +19,9 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "concurrently": "^9.0.1"
+    "@semantic-release/commit-analyzer": "^13.0.0",
+    "@semantic-release/git": "^10.0.1",
+    "concurrently": "^9.0.1",
+    "semantic-release": "^24.1.3"
   }
 }
