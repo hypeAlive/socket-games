@@ -2,6 +2,7 @@
 **/node_modules
 .idea
 /projects/frontend/.angular
+/projects/frontend/*.conf
 .vscode
 .secrets
 .variables
