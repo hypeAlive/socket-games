@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import errorRoutes from './features/error/error.routes';
+import {CreateResolver} from './features/join/services/create.resolver';
 
 export const routes: Routes = [
   {
@@ -9,6 +10,9 @@ export const routes: Routes = [
   {
     path: 'create',
     loadComponent: () => import('./features/join/pages/create/create.component'),
+    resolve: {
+      game: CreateResolver
+    }
   },
   {
     path: 'join',

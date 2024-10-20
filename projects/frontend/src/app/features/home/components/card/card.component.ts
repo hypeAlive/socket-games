@@ -1,12 +1,14 @@
 import {Component, Input} from '@angular/core';
 import {NgForOf} from '@angular/common';
 import {CmsGame} from '../../models/games.interface';
+import {RouterLink} from '@angular/router';
 
 @Component({
   selector: 'home-card',
   standalone: true,
   imports: [
-    NgForOf
+    NgForOf,
+    RouterLink
   ],
   templateUrl: './card.component.html',
   styles: []

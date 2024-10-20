@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {NgIf} from '@angular/common';
 import {WindowComponent} from '../../components/window/window.component';
+import {ActivatedRoute, Router} from '@angular/router';
+import {CmsGame} from '../../../home/models/games.interface';
 
 @Component({
   selector: 'app-create-page',
@@ -14,11 +16,15 @@ import {WindowComponent} from '../../components/window/window.component';
   templateUrl: './create.component.html',
   styles: []
 })
-export default class CreateComponent {
+export default class CreateComponent implements OnInit {
 
   protected createForm: FormGroup;
+  private gameData!: CmsGame;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private router: Router, private route: ActivatedRoute) {
+    this.route.data.subscribe(data => {
+      this.gameData = data['game'];
+    });
     this.createForm = this.fb.group({
       username: [''],
       password: [''],
@@ -32,6 +38,14 @@ export default class CreateComponent {
 
   onSubmit() {
     console.log(this.createForm.value);
+  }
+
+  ngOnInit(): void {
+    console.log(this.gameData);
+  }
+
+  protected get gameTitle(): string {
+    return this.gameData.translations[0].title;
   }
 
 }
