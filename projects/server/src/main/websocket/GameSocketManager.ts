@@ -17,13 +17,13 @@ export default class GameSocketManager {
         this.gameHandler = gameHandler;
         this.io = new Server(http);
 
-        this.io.on("connection", (socket) => this.handleConnection(socket));
+        this.io.of('socket').on("connection", (socket) => this.handleConnection(socket));
 
         LOGGER.info("Socket manager initialized 🕹️");
     }
 
     private handleConnection(socket: any) {
-        LOGGER.info("Client connected " + this.io.sockets.sockets.size + " 👤");
+        LOGGER.info("Client connected " + this.io.of('socket').sockets.size + " 👤");
         this.clientGamePlayerMap.set(socket.id, undefined);
 
         socket.on("join", (data:any) => this.handleJoin(socket, data));

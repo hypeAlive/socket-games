@@ -13,10 +13,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "socket-game-types": "../types",
-    "ts-optional": "github:hypeAlive/ts-optional",
+    "express": "^4.21.1",
     "rxjs": "^7.8.1",
+    "socket-game-types": "../types",
     "socket.io": "^4.7.5",
+    "ts-optional": "github:hypeAlive/ts-optional",
     "winston": "^3.13.1"
   },
   "devDependencies": {
