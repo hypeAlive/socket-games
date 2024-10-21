@@ -34,7 +34,6 @@ export class JoinGuard implements CanMatch {
     }
 
     if (!await this.gameService.gameExists(hash)) {
-      await this.router.navigate(['/']);
       return false;
     }
 
