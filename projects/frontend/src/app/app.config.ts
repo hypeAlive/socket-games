@@ -23,7 +23,7 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(
       LoggerModule.forRoot({
         level: environment.logLevel
-      }),
+      })
     ),
     provideAnimations(),
     provideRouter(routes),

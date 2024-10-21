@@ -1,8 +1,10 @@
-import {Events, GameId, PlayerId} from "socket-game-types";
+import {Events, GameId, PlayerId, SOCKET_DISCONNECT, SOCKET_JOIN, SocketJoin} from "socket-game-types";
 import {Subscription} from "rxjs";
 import {Server} from "socket.io";
 import GameHandler from "../base/GameHandler.js";
 import LoggingUtils from "../utils/LoggingUtils.js";
+import SocketRoom from "./SocketRoom.js";
+import UniqueId from "../utils/UniqueId.js";
 
 const LOGGER = LoggingUtils.createLogger("Socket", "\x1b[35m");
 
@@ -10,35 +12,96 @@ export default class GameSocketManager {
 
     private readonly clientGamePlayerMap = new Map<string, PlayerId | undefined>();
     private readonly roomSubs = new Map<string, Subscription[]>();
+    private readonly rooms = new Map<string, SocketRoom>();
+    private readonly clientRoomMap = new Map<string, string>();
     private readonly io: Server;
     private readonly gameHandler: GameHandler;
 
     constructor(http: any, gameHandler: GameHandler) {
         this.gameHandler = gameHandler;
-        this.io = new Server(http);
+        this.io = new Server(http, {
+            cors: {
+                origin: "*",
+            }
+        });
 
         this.io.of('socket').on("connection", (socket) => this.handleConnection(socket));
 
         LOGGER.info("Socket manager initialized 🕹️");
     }
 
-    private handleConnection(socket: any) {
-        LOGGER.info("Client connected " + this.io.of('socket').sockets.size + " 👤");
-        this.clientGamePlayerMap.set(socket.id, undefined);
-
-        socket.on("join", (data:any) => this.handleJoin(socket, data));
-        socket.on("action", (action:any) => this.handleAction(socket, action));
-        socket.on("leave", () => this.handleLeave(socket));
-        socket.on("start", () => this.handleStart(socket));
-        socket.on("disconnect", () => this.handleDisconnect(socket));
+    public roomExists(hash: string): boolean {
+        return this.rooms.has(hash);
     }
 
-    private handleJoin(socket: any, {namespace, gameId}: {namespace: string, gameId?: GameId}) {
+    public createRoom(password: string | undefined = undefined): string {
+        const uniqueId = UniqueId.generateUniqueHash(5, this.rooms.keys());
+
+        const room = new SocketRoom({
+            roomHash: uniqueId,
+            hasPassword: !!password,
+            password: password
+        }, this.io);
+        this.rooms.set(uniqueId, room);
+
+        LOGGER.info(`Created new room with hash ${uniqueId} 🔒`);
+
+        setTimeout(() => {
+            this.cleanRoom(uniqueId);
+        }, 30000);
+
+        return uniqueId;
+    }
+
+    private cleanRoom(hash: string) {
+        const room = this.rooms.get(hash);
+        if(!room) return;
+        if(room.clients().length > 0) return;
+
+        this.rooms.delete(hash);
+        LOGGER.debug(`Room ${hash} cleaned up 🧹`);
+    }
+
+    private handleConnection(client: any) {
+        LOGGER.info("Client connected " + this.io.of('socket').sockets.size + " 👤");
+        this.clientGamePlayerMap.set(client.id, undefined);
+
+        client.on(SOCKET_JOIN, (data:any) => this.handleJoin(client, data));
+        client.on("action", (action:any) => this.handleAction(client, action));
+        client.on("leave", () => this.handleLeave(client));
+        client.on("start", () => this.handleStart(client));
+        client.on(SOCKET_DISCONNECT, () => this.handleDisconnect(client));
+
+        setTimeout(() => {
+            if (Array.from(client.rooms).length === 1) {
+                client.disconnect();
+            }
+        }, 30000);
+    }
+
+    private handleJoin(client: any, data: SocketJoin) {
         try {
-            if (Array.from(socket.rooms).length > 1) {
-                socket.emit("error", {message: "You are already in a room."});
+            if (Array.from(client.rooms).length > 1) {
+                client.emit("error", {message: "You are already in a room."});
                 return;
             }
+
+            if(!data || !data.hash) {
+                client.emit("error", {message: "Invalid data."});
+                return;
+            }
+
+            let room = this.rooms.get(data.hash);
+
+            if (!room) {
+                client.emit("error", {message: "Room not found."});
+                return;
+            }
+
+            if(!room.join(client, data)) return;
+            this.clientRoomMap.set(client.id, data.hash);
+
+            /*
 
             if (!gameId) {
                 gameId = this.gameHandler.create(namespace).getId();
@@ -59,8 +122,9 @@ export default class GameSocketManager {
                 this.gameHandler.join(gameId, player);
                 LOGGER.debug(`Player ${player[1]} joined game ${gameId[0]}-${gameId[1]} 👤`);
             }, 0);
+             */
         } catch (e: any) {
-            socket.emit("error", {message: e.message});
+            client.emit("error", {message: e.message});
         }
     }
 
@@ -111,7 +175,15 @@ export default class GameSocketManager {
         }
     }
 
-    private handleDisconnect(socket: any) {
+    private handleDisconnect(client: any) {
+        LOGGER.info("Client disconnected " + this.io.sockets.sockets.size + " 👤");
+        const roomHash = this.clientRoomMap.get(client.id);
+
+        if(!roomHash) return;
+        this.cleanRoom(roomHash);
+
+
+        /*
         const playerId = this.getPlayerId(socket);
         if (playerId) {
             this.gameHandler.leave(playerId);
@@ -120,7 +192,8 @@ export default class GameSocketManager {
         }
         this.clientGamePlayerMap.delete(socket.id);
 
-        LOGGER.info("Client disconnected " + this.io.sockets.sockets.size + " 👤");
+
+         */
     }
 
     private subscribeToGameEvents(gameId: GameId) {

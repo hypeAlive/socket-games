@@ -5,23 +5,31 @@ import LoggingUtils from "./utils/LoggingUtils.js";
 import {createServer} from "http";
 import GameSocketManager from "./websocket/GameSocketManager.js";
 import DartGame from "./games/DartGame.js";
+import {router as apiRouter} from "./api/api.js";
+import cors from "cors";
 
 const LOGGER = LoggingUtils.createLogger("Server", "\x1b[34m");
 
 const PORT = 7070;
 
 const app = express();
-
-app.get("/api", (req, res) => {
-    res.send("Games API");
-});
+app.set('case sensitive routing', false);
+app.set('trust proxy', 1);
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(cors({
+    origin: '*'
+}));
+app.options('*', cors());
 
 LOGGER.info("Starting server... 👑❤️");
 const http = createServer(app);
 
 LOGGER.debug("Starting game handler...");
 const gameHandler = new GameHandler();
-new GameSocketManager(http, gameHandler);
+export const socketManager = new GameSocketManager(http, gameHandler);
+
+app.use("/api", apiRouter);
 
 LOGGER.debug("Registering games...");
 gameHandler.register(TikTakToeGame.GAME_TYPE);
