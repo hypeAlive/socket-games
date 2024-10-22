@@ -10,7 +10,7 @@ import {
   SOCKET_JOIN_ACCEPT,
   SOCKET_JOIN_ERROR,
   Event,
-  SocketJoin
+  SocketJoin, GameData, TikTakToeGameData, isGameEvent, isPlayerEvent
 } from 'socket-game-types';
 import {lastValueFrom} from 'rxjs';
 import {RoomNeeds} from 'socket-game-types/src/websocket/room.type';
@@ -34,7 +34,12 @@ export class GameService {
     });
 
     this.socket.on(SOCKET_GAME_EVENT, (data: Event<any, any>) => {
-      this.logger.debug("received game event:", data);
+      if(isGameEvent(data))
+        this.logger.debug("received game event:", data);
+      else if (isPlayerEvent(data))
+        this.logger.debug("received player event:", data);
+      else
+        this.logger.debug("received unknown event:", data);
     });
   }
 

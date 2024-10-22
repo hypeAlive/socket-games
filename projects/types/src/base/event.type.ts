@@ -34,3 +34,11 @@ export enum Events {
     NEXT_TURN = 'NEXT_TURN',
     GAME_ENDED = 'GAME_ENDED'
 }
+
+export function isGameEvent(event: Event<any, any>): event is GameEvent<any> {
+    return 'gameId' in event.data && (event as GameEvent<any>).data !== undefined;
+}
+
+export function isPlayerEvent(event: Event<any, any>): event is PlayerEvent<any> {
+    return 'playerId' in event.data && (event as PlayerEvent<any>).data !== undefined;
+}

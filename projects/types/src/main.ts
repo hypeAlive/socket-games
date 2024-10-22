@@ -1,4 +1,4 @@
-import {Event, Events, GameEvent, BaseEvent, PlayerEvent} from "./base/event.type.js";
+import {Event, Events, GameEvent, BaseEvent, PlayerEvent, isGameEvent, isPlayerEvent} from "./base/event.type.js";
 import {GameId, GameState, GameData} from "./base/game.type.js";
 import {PlayerId, PlayerAction, PlayerData} from "./base/player.type.js";
 
@@ -13,7 +13,7 @@ import {ApiCreateGame, ApiGameHash} from "./api/game.type.js";
 import {SocketJoin, SOCKET_JOIN, SOCKET_JOIN_ACCEPT, SOCKET_JOIN_ERROR, SOCKET_DISCONNECT, SOCKET_GAME_EVENT} from "./websocket/socket.type.js";
 
 
-export {Event, Events, BaseEvent, GameEvent, PlayerEvent};
+export {Event, Events, BaseEvent, GameEvent, PlayerEvent, isPlayerEvent, isGameEvent};
 export {GameId, GameState, GameData};
 export {PlayerId, PlayerAction, PlayerData};
 
