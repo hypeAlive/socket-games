@@ -105,11 +105,13 @@ export default class SocketRoom {
     public message(client: any, message: string) {
         const name = this.clientIdDataMap.get(client.id)?.name;
         if (!name) return;
-        this.socket.of('socket').to(this.roomData.roomHash).emit(SOCKET_MESSAGE, {
-            sender: name,
-            message: message,
-            timestamp: new Date().getTime()
-        } as SocketMessage);
+        this.socket.of('socket')
+            .to(this.roomData.roomHash)
+            .emit(SOCKET_MESSAGE, {
+                sender: name,
+                message: message,
+                timestamp: new Date().getTime()
+            } as SocketMessage);
     }
 
     public cleanUpGame() {
