@@ -1,4 +1,4 @@
-import {Events, GameId, PlayerId, SOCKET_DISCONNECT, SOCKET_JOIN, SocketJoin} from "socket-game-types";
+import {Events, GameId, PlayerId, SOCKET_DISCONNECT, SOCKET_JOIN, SOCKET_MESSAGE, SocketJoin} from "socket-game-types";
 import {Subscription} from "rxjs";
 import {Server} from "socket.io";
 import GameHandler from "../base/GameHandler.js";
@@ -77,6 +77,7 @@ export default class GameSocketManager {
         client.on("action", (action:any) => this.handleAction(client, action));
         client.on("leave", () => this.handleLeave(client));
         client.on("start", () => this.handleStart(client));
+        client.on(SOCKET_MESSAGE, (message: string) => this.handleMessage(client, message));
         client.on(SOCKET_DISCONNECT, () => this.handleDisconnect(client));
 
         setTimeout(() => {
@@ -84,6 +85,14 @@ export default class GameSocketManager {
                 client.disconnect();
             }
         }, 30000);
+    }
+
+    private handleMessage(client: any, message: string) {
+        const roomHash = this.clientRoomMap.get(client.id);
+        if(!roomHash) return;
+        const room = this.rooms.get(roomHash);
+        if(!room) return;
+        room.message(client, message);
     }
 
     private handleJoin(client: any, data: SocketJoin) {

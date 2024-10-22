@@ -6,8 +6,8 @@ import {
     PlayerId, SOCKET_DISCONNECT,
     SOCKET_GAME_EVENT,
     SOCKET_JOIN_ACCEPT,
-    SOCKET_JOIN_ERROR,
-    SocketJoin
+    SOCKET_JOIN_ERROR, SOCKET_MESSAGE,
+    SocketJoin, SocketMessage
 } from "socket-game-types";
 import AuthUtil from "../utils/AuthUtil.js";
 import {RoomNeeds} from "socket-game-types/src/websocket/room.type.js";
@@ -100,6 +100,16 @@ export default class SocketRoom {
                 return socketId;
             }
         }
+    }
+
+    public message(client: any, message: string) {
+        const name = this.clientIdDataMap.get(client.id)?.name;
+        if (!name) return;
+        this.socket.of('socket').to(this.roomData.roomHash).emit(SOCKET_MESSAGE, {
+            sender: name,
+            message: message,
+            timestamp: new Date().getTime()
+        } as SocketMessage);
     }
 
     public cleanUpGame() {
