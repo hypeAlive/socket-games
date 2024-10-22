@@ -10,7 +10,7 @@ import {BowlingAction, BowlingGameData, BowlingNamespace} from "./games/bowling.
 import {ConnectFourAction, ConnectFourGameData, ConnectFourNamespace} from "./games/connectfour.type.js";
 
 import {ApiCreateGame, ApiGameHash} from "./api/game.type.js";
-import {SocketJoin, SOCKET_JOIN, SOCKET_JOIN_ACCEPT, SOCKET_JOIN_ERROR, SOCKET_DISCONNECT} from "./websocket/socket.type.js";
+import {SocketJoin, SOCKET_JOIN, SOCKET_JOIN_ACCEPT, SOCKET_JOIN_ERROR, SOCKET_DISCONNECT, SOCKET_GAME_EVENT} from "./websocket/socket.type.js";
 
 
 export {Event, Events, BaseEvent, GameEvent, PlayerEvent};
@@ -25,4 +25,4 @@ export {BowlingAction, BowlingGameData, BowlingNamespace};
 export {ConnectFourAction, ConnectFourGameData, ConnectFourNamespace};
 
 export {ApiCreateGame, ApiGameHash};
-export {SocketJoin, SOCKET_JOIN, SOCKET_JOIN_ERROR, SOCKET_JOIN_ACCEPT, SOCKET_DISCONNECT};
+export {SocketJoin, SOCKET_JOIN, SOCKET_JOIN_ERROR, SOCKET_JOIN_ACCEPT, SOCKET_DISCONNECT, SOCKET_GAME_EVENT};

@@ -61,6 +61,8 @@ export default abstract class BaseGame<PD extends PlayerData, GD extends GameDat
         this.gd = {
             gameId: gameId,
             state: this.state,
+            minPlayers: this.minPlayers,
+            maxPlayers: this.maxPlayers,
             playerIds: [],
             currentPlayerIndex: -1
         } as unknown as GD;

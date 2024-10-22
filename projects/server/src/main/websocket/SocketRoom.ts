@@ -1,9 +1,18 @@
 import {Server, Socket} from "socket.io";
 import LoggingUtils from "../utils/LoggingUtils.js";
-import {GameId, SOCKET_JOIN_ACCEPT, SOCKET_JOIN_ERROR, SocketJoin} from "socket-game-types";
+import {
+    Events,
+    GameId,
+    PlayerId, SOCKET_DISCONNECT,
+    SOCKET_GAME_EVENT,
+    SOCKET_JOIN_ACCEPT,
+    SOCKET_JOIN_ERROR,
+    SocketJoin
+} from "socket-game-types";
 import AuthUtil from "../utils/AuthUtil.js";
 import {RoomNeeds} from "socket-game-types/src/websocket/room.type.js";
-import BaseGame from "../base/BaseGame.js";
+import GameHandler from "../base/GameHandler.js";
+import {Subscription} from "rxjs";
 
 type SocketRoomData = {
     namespace: string,
@@ -12,16 +21,30 @@ type SocketRoomData = {
     hashedPassword?: string,
 }
 
+type SocketUserData = {
+    name: string,
+    id: string,
+    playerId?: PlayerId,
+}
+
 const LOGGER = LoggingUtils.createLogger("Room", "\x1b[36m");
 
 export default class SocketRoom {
 
     private roomData: SocketRoomData;
     private socket: Server;
+    private gameHandler: GameHandler;
+    private game: GameId | undefined;
+    private eventSub: Subscription | undefined;
+    private endSub: Subscription | undefined;
+    private clientIdDataMap: Map<string, SocketUserData> = new Map();
+    private roomOwnerClientId: string | undefined;
 
-    constructor(roomData: SocketRoomData, socket: Server) {
+    constructor(roomData: SocketRoomData, socket: Server, gameHandler: GameHandler) {
         this.roomData = roomData;
         this.socket = socket;
+        this.gameHandler = gameHandler;
+        this.createGame();
     }
 
     public clients(): string[] {
@@ -36,21 +59,171 @@ export default class SocketRoom {
         }
     }
 
+    private createGame() {
+        if (this.game) return;
+        this.game = this.gameHandler.create(this.roomData.namespace).getId();
+
+        this.endSub = this.gameHandler.subscribe(() => {
+            this.cleanUpGame();
+        }, Events.GAME_ENDED, this.game);
+
+        this.eventSub = this.gameHandler.subscribe((event) => {
+            if (event.type === Events.PLAYER_DATA_CHANGED) {
+
+                const playerId = event.playerId;
+                if (!playerId) {
+                    LOGGER.warn("PlayerId of Player not found");
+                    return;
+                }
+                const socketId = this.getSocketIdFromPlayerId(playerId);
+                if (!socketId) {
+                    LOGGER.warn("SocketId of Player not found");
+                    return;
+                }
+                this.sendEventToClient(event, socketId);
+
+                return;
+            }
+            this.sendEventToRoom(event);
+        }, Events.ALL, this.game);
+        if (Array.of(this.clientIdDataMap.keys()).length >= 0) return;
+
+        this.clientIdDataMap.forEach((data) => {
+            this.joinGame(data.id);
+        });
+    }
+
+    private getSocketIdFromPlayerId(playerId: PlayerId): string | undefined {
+        for (const [socketId, data] of this.clientIdDataMap.entries()) {
+            LOGGER.debug(data.playerId + " " + playerId);
+            if (data.playerId && data.playerId[0] === playerId[0] && data.playerId[1] === playerId[1]) {
+                return socketId;
+            }
+        }
+    }
+
+    public cleanUpGame() {
+        this.clientIdDataMap.forEach((data) => {
+            this.leaveGame(data.id);
+        });
+        if (this.game) {
+            this.game = undefined;
+        }
+        if (this.eventSub) {
+            this.eventSub.unsubscribe();
+            this.eventSub = undefined;
+        }
+        if (this.endSub) {
+            this.endSub.unsubscribe();
+            this.endSub = undefined;
+        }
+    }
+
+    private joinGame(clientId: string) {
+        if (!this.game)
+            throw new Error("Game not created");
+
+        const clientData = this.clientIdDataMap.get(clientId);
+        if (!clientData)
+            throw new Error("Client data not found");
+
+        const playerId = this.gameHandler.createPlayerId(this.game);
+
+        this.clientIdDataMap.set(clientId, {
+            ...clientData,
+            playerId: playerId
+        });
+
+        this.gameHandler.join(this.game, playerId);
+
+    }
+
+    private leaveGame(clientId: string) {
+        if (!this.game)
+            throw new Error("Game not created");
+
+        const clientData = this.clientIdDataMap.get(clientId);
+        if (!clientData)
+            throw new Error("Client data not found");
+
+        if (!clientData.playerId) return;
+
+        this.gameHandler.leave(clientData.playerId);
+        this.clientIdDataMap.set(clientId, {
+            ...clientData,
+            playerId: undefined
+        });
+    }
+
     private get needsPassword(): boolean {
         return this.roomData.hasPassword && !!this.roomData.hashedPassword;
     }
 
+    private sendEventToClient(data: any, socketId: string) {
+        this.socket.of('socket')
+            .to(socketId)
+            .emit(SOCKET_GAME_EVENT, data);
+    }
+
+    private sendEventToRoom(data: any) {
+        this.socket.of('socket').to(this.roomData.roomHash).emit(SOCKET_GAME_EVENT, data);
+    }
+
     public join(client: any, data: SocketJoin): boolean {
-        if(this.needsPassword && this.roomData.hashedPassword) {
-            if(!data.password || !AuthUtil.verifyPassword(this.roomData.hashedPassword, data.password)) {
+        if (this.needsPassword && this.roomData.hashedPassword) {
+            if (!data.password || !AuthUtil.verifyPassword(this.roomData.hashedPassword, data.password)) {
                 client.emit(SOCKET_JOIN_ERROR, "Invalid password");
                 return false;
             }
         }
+
         client.join(this.roomData.roomHash);
+        try {
+            setTimeout(() => {
+                this.setClientData(client, data);
+                this.joinGame(client.id);
+            }, 0);
+        } catch (e) {
+            client.leave(this.roomData.roomHash);
+            client.emit(SOCKET_JOIN_ERROR, e);
+            return false;
+        }
         client.emit(SOCKET_JOIN_ACCEPT, this.roomData.roomHash);
         LOGGER.debug(`Client joined room ${this.roomData.roomHash} 👤`);
         return true;
+    }
+
+    public leave(client: any) {
+        try {
+            this.leaveGame(client.id);
+            if (client.id === this.roomOwnerClientId) {
+                this.roomOwnerClientId = this.findNewOwner();
+            }
+        } catch (e) {
+            LOGGER.error(e);
+        }
+    }
+
+    private findNewOwner() {
+        const firstClientId = this.clientIdDataMap.keys().next().value;
+        return firstClientId ? firstClientId : undefined;
+    }
+
+    private setClientData(client: any, data: SocketJoin) {
+        if (this.clientIdDataMap.has(client.id)) return;
+        this.clientIdDataMap.set(client.id, {
+            name: data.name,
+            id: client.id,
+        });
+        LOGGER.info(`Client data set for ${client.id} 📝`);
+        LOGGER.debug(this.clientIdDataMap.get(client.id));
+
+        if (this.roomOwnerClientId) return;
+        this.roomOwnerClientId = client.id;
+    }
+
+    public getHash(): string {
+        return this.roomData.roomHash;
     }
 
 }

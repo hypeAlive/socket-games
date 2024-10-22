@@ -5,14 +5,16 @@ import {environment} from '../../../environment/environment';
 import {
   ApiCreateGame,
   ApiGameHash,
-  SOCKET_DISCONNECT,
+  SOCKET_DISCONNECT, SOCKET_GAME_EVENT,
   SOCKET_JOIN,
   SOCKET_JOIN_ACCEPT,
   SOCKET_JOIN_ERROR,
+  Event,
   SocketJoin
 } from 'socket-game-types';
 import {lastValueFrom} from 'rxjs';
 import {RoomNeeds} from 'socket-game-types/src/websocket/room.type';
+import {NGXLogger} from 'ngx-logger';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +24,7 @@ export class GameService {
   private socket: Socket;
   private roomHash: string | undefined;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private logger: NGXLogger) {
     this.socket = io(environment.socketUrl, {
       autoConnect: false
     });
@@ -31,8 +33,8 @@ export class GameService {
       this.roomHash = undefined;
     });
 
-    this.socket.on('error', (error: any) => {
-
+    this.socket.on(SOCKET_GAME_EVENT, (data: Event<any, any>) => {
+      this.logger.debug("received game event:", data);
     });
   }
 

@@ -18,6 +18,8 @@ export enum GameState {
 export type GameData = {
     gameId: GameId,
     playerIds: PlayerId[],
+    minPlayers: number,
+    maxPlayers: number,
     state: GameState,
     currentPlayerIndex: number,
     winnerId?: PlayerId,

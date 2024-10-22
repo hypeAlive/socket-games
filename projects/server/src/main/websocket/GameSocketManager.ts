@@ -46,13 +46,13 @@ export default class GameSocketManager {
             roomHash: uniqueId,
             hasPassword: !!password,
             hashedPassword: password ? AuthUtil.hashPassword(password) : undefined
-        }, this.io);
+        }, this.io, this.gameHandler);
         this.rooms.set(uniqueId, room);
 
         LOGGER.info(`Created new room with hash ${uniqueId} 🔒`);
 
         setTimeout(() => {
-            this.cleanRoom(uniqueId);
+            this.cleanRoom(room);
         }, 30000);
 
         return uniqueId;
@@ -62,13 +62,11 @@ export default class GameSocketManager {
         return this.rooms.get(hash);
     }
 
-    private cleanRoom(hash: string) {
-        const room = this.rooms.get(hash);
-        if(!room) return;
+    private cleanRoom(room: SocketRoom) {
         if(room.clients().length > 0) return;
 
-        this.rooms.delete(hash);
-        LOGGER.debug(`Room ${hash} cleaned up 🧹`);
+        this.rooms.delete(room.getHash());
+        LOGGER.debug(`Room ${room.getHash()} cleaned up 🧹`);
     }
 
     private handleConnection(client: any) {
@@ -189,7 +187,10 @@ export default class GameSocketManager {
         const roomHash = this.clientRoomMap.get(client.id);
 
         if(!roomHash) return;
-        this.cleanRoom(roomHash);
+        const room = this.rooms.get(roomHash);
+        if(!room) return;
+        room.leave(client);
+        this.cleanRoom(room);
 
 
         /*

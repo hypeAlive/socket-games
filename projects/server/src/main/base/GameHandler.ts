@@ -54,6 +54,7 @@ export default class GameHandler {
      * Joins a player to a game instance, generating a new player id.
      *
      * @param gameId - The id of the game instance.
+     * @param playerId
      * @returns The id of the player that joined the game.
      */
     public join(gameId: GameId, playerId?: PlayerId): PlayerId {
