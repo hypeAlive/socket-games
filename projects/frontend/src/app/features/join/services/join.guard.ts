@@ -29,11 +29,13 @@ export class JoinGuard implements CanMatch {
     console.log(segments);
 
     if (!hash) {
+      console.log("no hash");
       await this.router.navigate(['/']);
       return false;
     }
 
     if (!await this.gameService.gameExists(hash)) {
+      console.log("game does not exist");
       return false;
     }
 

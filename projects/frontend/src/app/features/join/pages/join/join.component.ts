@@ -1,9 +1,11 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {WindowComponent} from '../../components/window/window.component';
 import {NgIf} from '@angular/common';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {SocketJoin} from 'socket-game-types';
 import {ActivatedRoute, Router} from '@angular/router';
+import {CmsGame} from '../../../home/models/games.interface';
+import {RoomNeeds} from 'socket-game-types/dist/src/websocket/room.type';
 
 @Component({
   selector: 'app-join-page',
@@ -16,11 +18,17 @@ import {ActivatedRoute, Router} from '@angular/router';
   templateUrl: './join.component.html',
   styles: []
 })
-export default class JoinComponent {
+export default class JoinComponent implements OnInit{
 
   protected joinForm: FormGroup;
+  private gameData!: CmsGame;
+  private needs!: RoomNeeds;
 
   constructor(private fb: FormBuilder, private router: Router, private route: ActivatedRoute) {
+    this.route.data.subscribe(data => {
+      this.gameData = data['game'];
+      this.needs = data['needs'];
+    });
     this.joinForm = this.fb.group({
       username: ['', Validators.required],
       password: ['']
@@ -28,7 +36,7 @@ export default class JoinComponent {
   }
 
   protected get needPassword() {
-    return false;
+    return this.needs.password;
   }
 
   private get hash() {
@@ -49,6 +57,15 @@ export default class JoinComponent {
       },
       onSameUrlNavigation: 'reload'
     });
+  }
+
+  protected get gameTitle() {
+    return this.gameData.translations[0].title;
+  }
+
+  ngOnInit(): void {
+    console.log("gameData", this.gameData);
+    console.log("needs", this.needs);
   }
 
 }

@@ -1,6 +1,7 @@
 import express from "express";
 import {socketManager} from "../main.js";
 import {ApiCreateGame, ApiGameHash} from "socket-game-types";
+import SocketRoom from "../websocket/SocketRoom.js";
 
 export const router = express.Router();
 
@@ -18,24 +19,48 @@ router.post("/create", (req, res) => {
         return
     }
 
-    const hash = socketManager.createRoom();
-    res.send({hash: hash} as ApiGameHash);
+    const hash = socketManager.createRoom(data.namespace, data.password);
 
+    if(!hash) {
+        res.status(400).send("Invalid namespace");
+        return;
+    }
+
+    res.send({hash: hash} as ApiGameHash);
 });
 
 router.get('/exists/:hash', (req, res) => {
     const hash = req.params.hash;
 
-    if(!hash) {
-        res.status(400).send("Invalid hash");
-        return;
-    }
-
-    const exists = socketManager.roomExists(hash);
-
-    if(!exists) {
-        res.status(404).send("Room not found");
-    } else {
+    if (checkRoomExists(hash, res)) {
         res.status(200).send("Room found");
     }
 });
+
+router.get('/needs/:hash', (req, res) => {
+    const hash = req.params.hash;
+
+    let room = checkRoomExists(hash, res);
+    if (!room) {
+        res.status(404).send("Room not found");
+        return;
+    }
+
+    res.status(200).send(room.getNeeds());
+});
+
+const checkRoomExists = (hash: string, res: express.Response): SocketRoom | undefined => {
+    if (!hash) {
+        res.status(404).send("Invalid hash");
+        return undefined;
+    }
+
+    const room = socketManager.roomExists(hash);
+
+    if (!room) {
+        res.status(404).send("Room not found");
+        return undefined;
+    }
+
+    return room;
+};

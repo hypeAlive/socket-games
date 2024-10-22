@@ -12,6 +12,7 @@ import {
   SocketJoin
 } from 'socket-game-types';
 import {lastValueFrom} from 'rxjs';
+import {RoomNeeds} from 'socket-game-types/src/websocket/room.type';
 
 @Injectable({
   providedIn: 'root'
@@ -50,6 +51,10 @@ export class GameService {
     } catch (error: any) {
       return error.status === 200;
     }
+  }
+
+  public async gameNeeds(hash: string): Promise<RoomNeeds> {
+    return await lastValueFrom(this.http.get<RoomNeeds>(`${environment.apiUrl}/needs/${hash}`));
   }
 
   private connect() {

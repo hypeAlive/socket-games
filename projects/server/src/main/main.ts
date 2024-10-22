@@ -7,6 +7,7 @@ import GameSocketManager from "./websocket/GameSocketManager.js";
 import DartGame from "./games/DartGame.js";
 import {router as apiRouter} from "./api/api.js";
 import cors from "cors";
+import AuthUtil from "./utils/AuthUtil.js";
 
 const LOGGER = LoggingUtils.createLogger("Server", "\x1b[34m");
 
@@ -30,6 +31,16 @@ const gameHandler = new GameHandler();
 export const socketManager = new GameSocketManager(http, gameHandler);
 
 app.use("/api", apiRouter);
+
+const password = "Hallo123";
+
+LOGGER.info("test jwt with " + password);
+
+const hash = AuthUtil.hashPassword(password);
+
+LOGGER.info("hashed " + hash);
+
+LOGGER.info("verify " + AuthUtil.verifyPassword(hash, password));
 
 LOGGER.debug("Registering games...");
 gameHandler.register(TikTakToeGame.GAME_TYPE);

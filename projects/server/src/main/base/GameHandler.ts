@@ -111,7 +111,7 @@ export default class GameHandler {
      * @returns True if the game type is registered, otherwise false.
      * @private
      */
-    private isRegistered(param: string | GameType<any, any, any>): boolean {
+    public isRegistered(param: string | GameType<any, any, any>): boolean {
         if (typeof param === 'string') return this.registered.has(param);
 
         return this.registered.has(param.namespace);

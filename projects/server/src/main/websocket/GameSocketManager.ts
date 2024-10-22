@@ -5,6 +5,7 @@ import GameHandler from "../base/GameHandler.js";
 import LoggingUtils from "../utils/LoggingUtils.js";
 import SocketRoom from "./SocketRoom.js";
 import UniqueId from "../utils/UniqueId.js";
+import AuthUtil from "../utils/AuthUtil.js";
 
 const LOGGER = LoggingUtils.createLogger("Socket", "\x1b[35m");
 
@@ -30,17 +31,21 @@ export default class GameSocketManager {
         LOGGER.info("Socket manager initialized 🕹️");
     }
 
-    public roomExists(hash: string): boolean {
-        return this.rooms.has(hash);
+    public roomExists(hash: string): SocketRoom | undefined {
+        return this.rooms.get(hash);
     }
 
-    public createRoom(password: string | undefined = undefined): string {
+    public createRoom(nameSpace: string, password: string | undefined = undefined): string | undefined {
+
+        if(!this.gameHandler.isRegistered(nameSpace)) return undefined;
+
         const uniqueId = UniqueId.generateUniqueHash(5, this.rooms.keys());
 
         const room = new SocketRoom({
+            namespace: nameSpace,
             roomHash: uniqueId,
             hasPassword: !!password,
-            password: password
+            hashedPassword: password ? AuthUtil.hashPassword(password) : undefined
         }, this.io);
         this.rooms.set(uniqueId, room);
 
@@ -51,6 +56,10 @@ export default class GameSocketManager {
         }, 30000);
 
         return uniqueId;
+    }
+
+    public getRoom(hash: string): SocketRoom | undefined {
+        return this.rooms.get(hash);
     }
 
     private cleanRoom(hash: string) {

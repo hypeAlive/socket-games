@@ -1,4 +1,4 @@
-<join-window title="Join a Game">
+<join-window title="Join {{ gameTitle }} Game">
   <form [formGroup]="joinForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
     <input type="text"
            formControlName="username"

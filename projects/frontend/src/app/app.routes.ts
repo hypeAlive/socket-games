@@ -1,7 +1,8 @@
 import { Routes } from '@angular/router';
 import errorRoutes from './features/error/error.routes';
-import {CreateResolver} from './features/join/services/create.resolver';
+import {GameResolver} from './features/join/services/game.resolver';
 import {JoinGuard} from './features/join/services/join.guard';
+import {NeedResolver} from './features/join/services/need.resolver';
 
 export const routes: Routes = [
   {
@@ -12,13 +13,17 @@ export const routes: Routes = [
     path: 'create',
     loadComponent: () => import('./features/join/pages/create/create.component'),
     resolve: {
-      game: CreateResolver
+      game: GameResolver
     }
   },
   {
     path: 'join/:hash',
     loadComponent: () => import('./features/join/pages/join/join.component'),
-    canMatch: [JoinGuard]
+    canMatch: [JoinGuard],
+    resolve: {
+      needs: NeedResolver,
+      game: GameResolver
+    }
   },
   {
     path: 'game',
