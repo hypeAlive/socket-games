@@ -34,6 +34,7 @@ export class NeedResolver implements Resolve<Promise<CmsGame>> {
 
     try {
       let needs = await this.game.gameNeeds(hash);
+      console.log(navigation?.extras?.state)
       await this.router.navigate([state.url], { state: { needs: needs } });
     } catch (error) {
       console.error(error);

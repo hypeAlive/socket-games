@@ -42,8 +42,14 @@ export class JoinGuard implements CanMatch {
     if (navigation?.extras?.state?.['join']) {
       const join = navigation.extras.state['join'] as SocketJoin;
 
+      console.log(navigation?.extras?.state)
+
       if(await this.gameService.join(join)) {
-        await this.router.navigate(['/game', hash]);
+        await this.router.navigate(['/game', hash], {
+          state: {
+            game: navigation?.extras?.state?.['game']
+          }
+        });
         this.toastr.success(`Successfully joined game ${hash}`);
         return false;
       }

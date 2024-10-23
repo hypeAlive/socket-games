@@ -59,7 +59,8 @@ export default class CreateComponent implements OnInit, AfterViewInit {
               name: this.createForm.controls['username'].value,
               hash: data.hash,
               password: this.needPassword ? this.createForm.controls['password'].value : undefined
-            } as SocketJoin
+            } as SocketJoin,
+            game: this.gameData
           }
         });
       })

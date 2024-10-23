@@ -2,12 +2,13 @@ import {Component, OnDestroy, OnInit, Type} from '@angular/core';
 import {ChatComponent} from '../../components/chat/chat/chat.component';
 import {ChatMessageComponent} from '../../components/chat/chat-message/chat-message.component';
 import {ChatInputComponent} from '../../components/chat/chat-input/chat-input.component';
-import {RouterOutlet} from '@angular/router';
+import {ActivatedRoute, RouterOutlet} from '@angular/router';
 import {NgComponentOutlet} from '@angular/common';
 import {LobbyComponent} from '../lobby/lobby.component';
 import {GameService} from '../../../../shared/services/game.service';
 import {Subscription} from 'rxjs';
 import {GameData, GameState} from 'socket-game-types';
+import {CmsGame} from '../../../home/models/games.interface';
 
 @Component({
   selector: 'app-game',
@@ -25,9 +26,13 @@ import {GameData, GameState} from 'socket-game-types';
 export default class GameComponent implements OnInit, OnDestroy {
 
   private gameDataSub!: Subscription;
-  private gameData: GameData | undefined
+  private gameData: GameData | undefined;
+  private cmsGame!: CmsGame;
 
-  constructor(private game: GameService) {
+  constructor(private game: GameService, private route: ActivatedRoute) {
+    this.route.data.subscribe(data => {
+      this.cmsGame = data['game'];
+    });
   }
 
   protected get gameComponent() {
@@ -40,7 +45,8 @@ export default class GameComponent implements OnInit, OnDestroy {
       return {
         component: LobbyComponent,
         inputs: {
-          gameData: this.gameData
+          gameData: this.gameData,
+          cmsGame: this.cmsGame
         }
       }
 
@@ -57,6 +63,7 @@ export default class GameComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.gameDataSub.unsubscribe();
   }
 
 }

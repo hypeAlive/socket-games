@@ -31,6 +31,9 @@ export const routes: Routes = [
   {
     path: 'game',
     loadChildren: () => import('./features/game/game.module'),
+    resolve: {
+      game: GameResolver
+    }
   },
   ...errorRoutes
 ];

@@ -43,6 +43,6 @@ export class GameResolver implements Resolve<Promise<CmsGame>> {
     }
 
     await this.router.navigate(['/']);
-    this.toastr.error(`No game hash provided`);
+    //this.toastr.error(`No game hash provided`);
   }
 }

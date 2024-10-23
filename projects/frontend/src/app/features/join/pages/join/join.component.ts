@@ -55,7 +55,8 @@ export default class JoinComponent implements OnInit, AfterViewInit {
           name: this.joinForm.controls['username'].value,
           hash: this.hash,
           password: this.needPassword ? this.joinForm.controls['password'].value : undefined
-        } as SocketJoin
+        } as SocketJoin,
+        game: this.gameData
       },
       onSameUrlNavigation: 'reload'
     });

@@ -23,7 +23,7 @@ import {GameInputBase} from '../../directives/game-input-base.directive';
     })
   ]
 })
-export class LobbyComponent extends GameInputBase<GameData, PlayerData>{
+export class LobbyComponent extends GameInputBase<GameData, PlayerData> {
 
   constructor() {
     super();
@@ -41,9 +41,9 @@ export class LobbyComponent extends GameInputBase<GameData, PlayerData>{
     return this.gameData.players;
   }
 
-
-
-
+  protected get gameTitle() {
+    return this.cmsGame.translations[0].title;
+  }
 
   startGame() {
     // Logic to start the game
