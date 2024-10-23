@@ -11,6 +11,7 @@ import {GameData, GameState, PlayerData} from 'socket-game-types';
 import {CmsGame} from '../../../home/models/games.interface';
 import {TikTakToeComponent} from '../tik-tak-toe/tik-tak-toe.component';
 import {CurrentTurnComponent} from '../../components/current-turn/current-turn.component';
+import {EndComponent} from '../end/end.component';
 
 @Component({
   selector: 'app-game',
@@ -47,9 +48,19 @@ export default class GameComponent implements OnInit, OnDestroy {
       inputs: {}
     };
 
-    if (this.gameData.state === GameState.WAITING)
+    if (this.isGameState(GameState.WAITING))
       return {
         component: LobbyComponent,
+        inputs: {
+          gameData: this.gameData,
+          playerData: this.playerData,
+          cmsGame: this.cmsGame
+        }
+      }
+
+    if(this.isGameState(GameState.ENDED))
+      return {
+        component: EndComponent,
         inputs: {
           gameData: this.gameData,
           playerData: this.playerData,
@@ -93,7 +104,11 @@ export default class GameComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.gameDataSub = this.game.subscribeGameData((data) => {
-      this.gameData = data;
+      if(!data) return;
+      this.gameData = {
+        ...this.gameData,
+        ...data
+      };
     });
     this.playerDataSub = this.game.subscribePlayerData((data) => {
       this.playerData = data;

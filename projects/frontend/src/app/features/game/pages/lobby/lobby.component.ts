@@ -41,10 +41,6 @@ export class LobbyComponent extends GameInputBase<GameData, PlayerData> implemen
     return this.gameData.players;
   }
 
-  protected get gameTitle() {
-    return this.cmsGame.translations[0].title;
-  }
-
   protected get isOwner() {
     return this.game.isRoomOwner;
   }

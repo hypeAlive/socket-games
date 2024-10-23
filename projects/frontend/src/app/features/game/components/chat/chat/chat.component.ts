@@ -53,6 +53,9 @@ export class ChatComponent implements AfterViewInit {
   protected toggleChat() {
     this.isChatOpen = !this.isChatOpen;
     this.currentMessage = this.messages.length;
+    if(this.isChatOpen) {
+      this.scrollToBottom();
+    }
   }
 
   @HostListener('document:click', ['$event'])
@@ -65,6 +68,10 @@ export class ChatComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    this.scrollToBottom();
+  }
+
+  private scrollToBottom() {
     try {
       this.messageContainer.nativeElement.scrollTop = this.messageContainer.nativeElement.scrollHeight;
     } catch (err) {

@@ -24,6 +24,10 @@ export class GameInputBase<GD extends GameData, PD extends PlayerData> {
     return this.route.snapshot.paramMap.get('hash');
   }
 
+  protected get gameTitle() {
+    return this.cmsGame.translations[0].title;
+  }
+
   protected isMyTurn() {
     if(this.gameData.currentPlayerIndex === -1) return false;
     return this.gameData.players[this.gameData.currentPlayerIndex].playerId[1] === this.playerData.playerId[1];

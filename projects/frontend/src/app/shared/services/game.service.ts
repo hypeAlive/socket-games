@@ -5,26 +5,31 @@ import {environment} from '../../../environment/environment';
 import {
   ApiCreateGame,
   ApiGameHash,
+  Event,
+  Events,
+  GameData,
+  GameState,
+  isGameEvent,
+  isPlayerEvent,
+  isSystemYouAre,
+  PlayerAction,
+  PlayerData,
   SOCKET_DISCONNECT,
-  SOCKET_GAME_EVENT,
+  SOCKET_GAME_ACTION,
+  SOCKET_GAME_EVENT, SOCKET_GAME_RECREATE,
+  SOCKET_GAME_START,
   SOCKET_JOIN,
   SOCKET_JOIN_ACCEPT,
   SOCKET_JOIN_ERROR,
-  Event,
-  SocketJoin,
-  GameData,
-  TikTakToeGameData,
-  isGameEvent,
-  isPlayerEvent,
-  GameEvent,
-  PlayerData,
   SOCKET_MESSAGE,
-  SocketMessage, SOCKET_SYSTEM_EVENT, SystemEvent, isSystemYouAre, SOCKET_GAME_START, PlayerAction, SOCKET_GAME_ACTION
+  SOCKET_SYSTEM_EVENT,
+  SocketJoin,
+  SocketMessage,
+  SystemEvent
 } from 'socket-game-types';
-import {BehaviorSubject, lastValueFrom, Observer, Subject} from 'rxjs';
+import {BehaviorSubject, lastValueFrom, Observer} from 'rxjs';
 import {RoomNeeds} from 'socket-game-types/src/websocket/room.type';
 import {NGXLogger} from 'ngx-logger';
-import {ToastrService} from 'ngx-toastr';
 
 export interface FrontendMessage extends SocketMessage{
   isMe: boolean;
@@ -56,6 +61,7 @@ export class GameService {
 
     this.socket.on(SOCKET_GAME_EVENT, (data: Event<any, any>) => {
       if(isGameEvent(data)) {
+        if(data.data.state === GameState.ENDED && data.type === Events.PLAYER_LEFT) return;
         this.logger.debug("received game event:", data);
         this.gameDataSubject.next(data['data']);
       } else if (isPlayerEvent(data)) {
@@ -92,6 +98,13 @@ export class GameService {
     if (!this.roomHash) return;
     if (!this.isRoomOwner) return;
     this.socket.emit(SOCKET_GAME_START, {})
+  }
+
+  public sendRecreateGame() {
+    if (!this.roomHash) return;
+    if (!this.isRoomOwner) return;
+    console.log("sending recreate game");
+    this.socket.emit(SOCKET_GAME_RECREATE, {})
   }
 
   public createGame(namespace: string, password?: string) {

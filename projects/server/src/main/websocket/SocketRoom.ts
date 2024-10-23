@@ -61,12 +61,26 @@ export default class SocketRoom {
         }
     }
 
-    private createGame() {
+    public createGame(client: any = undefined) {
+        LOGGER.debug("Creating game 1");
+        if(client && this.roomOwnerClientId && client.id !== this.roomOwnerClientId) return;
+        LOGGER.debug("Creating game 2");
         if (this.game) return;
+        LOGGER.debug("Creating game 3");
         this.game = this.gameHandler.create(this.roomData.namespace).getId();
 
-        this.endSub = this.gameHandler.subscribe(() => {
-            this.cleanUpGame();
+        this.endSub = this.gameHandler.subscribe(data => {
+            setTimeout(() => {
+                this.cleanUpGame();
+            }, 0);
+            if(data.data.winnerId) {
+                const socketId = this.getSocketIdFromPlayerId(data.data.winnerId);
+                if (!socketId) return;
+                const winner = this.clientIdDataMap.get(socketId);
+                if(winner) {
+                    this.sendSystemMessage(`${winner.name} won the game 🏆`);
+                }
+            }
         }, Events.GAME_ENDED, this.game);
 
         this.eventSub = this.gameHandler.subscribe((event) => {
@@ -88,7 +102,7 @@ export default class SocketRoom {
             }
             this.sendEventToRoom(event);
         }, Events.ALL, this.game);
-        if (Array.of(this.clientIdDataMap.keys()).length >= 0) return;
+        if (Array.of(this.clientIdDataMap.keys()).length <= 0) return;
 
         this.clientIdDataMap.forEach((data) => {
             this.joinGame(data.id);

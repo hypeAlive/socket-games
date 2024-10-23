@@ -2,7 +2,7 @@ import {
     Events,
     GameId, PlayerAction,
     PlayerId,
-    SOCKET_DISCONNECT, SOCKET_GAME_ACTION,
+    SOCKET_DISCONNECT, SOCKET_GAME_ACTION, SOCKET_GAME_RECREATE,
     SOCKET_GAME_START,
     SOCKET_JOIN,
     SOCKET_MESSAGE,
@@ -85,6 +85,7 @@ export default class GameSocketManager {
         client.on(SOCKET_JOIN, (data:any) => this.handleJoin(client, data));
         client.on(SOCKET_GAME_ACTION, (action:PlayerAction) => this.handleAction(client, action));
         client.on("leave", () => this.handleLeave(client));
+        client.on(SOCKET_GAME_RECREATE, () => this.handleRecreate(client));
         client.on(SOCKET_GAME_START, () => this.handleStart(client));
         client.on(SOCKET_MESSAGE, (message: string) => this.handleMessage(client, message));
         client.on(SOCKET_DISCONNECT, () => this.handleDisconnect(client));
@@ -159,6 +160,15 @@ export default class GameSocketManager {
         const room = this.rooms.get(roomHash);
         if(!room) return;
         room.action(client, action);
+    }
+
+    private handleRecreate(client: any) {
+        const roomHash = this.clientRoomMap.get(client.id);
+        if(!roomHash) return;
+        const room = this.rooms.get(roomHash);
+        if(!room) return;
+        LOGGER.debug(`Recreating game for room ${room.getHash()} 🎮`);
+        room.createGame(client);
     }
 
     private handleLeave(socket: any) {

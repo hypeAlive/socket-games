@@ -43,6 +43,7 @@ export const SOCKET_JOIN_ERROR = "join-error";
 export const SOCKET_GAME_EVENT = "game-event";
 export const SOCKET_GAME_START = "game-start";
 export const SOCKET_GAME_ACTION = "game-action";
+export const SOCKET_GAME_RECREATE = "game-recreate";
 
 export const SOCKET_DISCONNECT = "disconnect";
 
