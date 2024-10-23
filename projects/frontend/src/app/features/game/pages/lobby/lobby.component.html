@@ -1,0 +1,26 @@
+<div class="container mx-auto py-12 flex justify-center">
+  <div class="bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-10 max-w-md mx-auto">
+    <h2 class="text-3xl font-semibold mb-8 text-center text-gray-900 dark:text-white">Game Lobby</h2>
+    <div class="flex justify-center mb-8 items-center">
+      <div *ngFor="let player of players; let i = index" class="w-20 h-20 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center mx-2">
+        <ng-icon strokeWidth="2" class="text-4xl" name="hugeUser"/>
+      </div>
+      <div *ngFor="let n of [].constructor(minPlayers - players.length); let i = index"
+           class="add-player">
+        <ng-icon strokeWidth="2" class="text-3xl" name="hugePlusSign"/>
+      </div>
+      <div *ngIf="players.length >= minPlayers && players.length < maxPlayers"
+           class="add-player">
+        <ng-icon strokeWidth="2" class="text-3xl" name="hugePlusSign"/>
+      </div>
+    </div>
+    <div class="text-center mb-8 text-gray-900 dark:text-white">
+      {{ minPlayers - players.length }} more player(s) needed
+    </div>
+    <div class="flex justify-center">
+      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" [disabled]="players.length < minPlayers" (click)="startGame()">
+        Start Game
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,16 @@
+.add-player {
+  @apply w-16 h-16 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center mx-2;
+  ng-icon {
+    @apply transition-all
+  }
+  &:hover {
+    ng-icon {
+      @apply scale-125
+    }
+  }
+  &:active {
+    ng-icon {
+      @apply scale-110
+    }
+  }
+}

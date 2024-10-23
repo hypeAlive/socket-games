@@ -10,9 +10,9 @@ import {
   SOCKET_JOIN_ACCEPT,
   SOCKET_JOIN_ERROR,
   Event,
-  SocketJoin, GameData, TikTakToeGameData, isGameEvent, isPlayerEvent
+  SocketJoin, GameData, TikTakToeGameData, isGameEvent, isPlayerEvent, GameEvent, PlayerData
 } from 'socket-game-types';
-import {lastValueFrom} from 'rxjs';
+import {BehaviorSubject, lastValueFrom, Observer} from 'rxjs';
 import {RoomNeeds} from 'socket-game-types/src/websocket/room.type';
 import {NGXLogger} from 'ngx-logger';
 
@@ -23,6 +23,8 @@ export class GameService {
 
   private socket: Socket;
   private roomHash: string | undefined;
+  private gameDataSubject: BehaviorSubject<any | undefined> = new BehaviorSubject<any | undefined>(undefined);
+  private playerDataSubject: BehaviorSubject<any | undefined> = new BehaviorSubject<any | undefined>(undefined);
 
   constructor(private http: HttpClient, private logger: NGXLogger) {
     this.socket = io(environment.socketUrl, {
@@ -34,11 +36,11 @@ export class GameService {
     });
 
     this.socket.on(SOCKET_GAME_EVENT, (data: Event<any, any>) => {
-      if(isGameEvent(data))
-        this.logger.debug("received game event:", data);
-      else if (isPlayerEvent(data))
-        this.logger.debug("received player event:", data);
-      else
+      if(isGameEvent(data)) {
+        this.gameDataSubject.next(data['data']);
+      } else if (isPlayerEvent(data)) {
+        this.playerDataSubject.next(data['data']);
+      } else
         this.logger.debug("received unknown event:", data);
     });
   }
@@ -49,6 +51,14 @@ export class GameService {
       password: password,
       hasPassword: !!password
     } as ApiCreateGame));
+  }
+
+  public subscribeGameData<T extends GameData>(observerOrNext?: Partial<Observer<T | undefined>> | ((value: T | undefined) => void)) {
+    return this.gameDataSubject.subscribe(observerOrNext);
+  }
+
+  public subscribePlayerData<T extends PlayerData>(observerOrNext?: Partial<Observer<T | undefined>> | ((value: T | undefined) => void)) {
+    return this.playerDataSubject.subscribe(observerOrNext);
   }
 
   public async gameExists(hash: string) {
