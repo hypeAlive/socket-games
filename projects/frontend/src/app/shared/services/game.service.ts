@@ -19,12 +19,16 @@ import {
   GameEvent,
   PlayerData,
   SOCKET_MESSAGE,
-  SocketMessage
+  SocketMessage, SOCKET_SYSTEM_EVENT, SystemEvent, isSystemYouAre
 } from 'socket-game-types';
 import {BehaviorSubject, lastValueFrom, Observer, Subject} from 'rxjs';
 import {RoomNeeds} from 'socket-game-types/src/websocket/room.type';
 import {NGXLogger} from 'ngx-logger';
 import {ToastrService} from 'ngx-toastr';
+
+export interface FrontendMessage extends SocketMessage{
+  isMe: boolean;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -35,7 +39,10 @@ export class GameService {
   private roomHash: string | undefined;
   private gameDataSubject: BehaviorSubject<any | undefined> = new BehaviorSubject<any | undefined>(undefined);
   private playerDataSubject: BehaviorSubject<any | undefined> = new BehaviorSubject<any | undefined>(undefined);
-  private messageSubject: Subject<SocketMessage> = new Subject<SocketMessage>();
+  public isRoomOwner: boolean = false;
+  public messages: FrontendMessage[] = [];
+  private id: string | undefined;
+  private name: string | undefined;
 
   constructor(private http: HttpClient,
               private logger: NGXLogger) {
@@ -57,8 +64,22 @@ export class GameService {
     });
 
     this.socket.on(SOCKET_MESSAGE, (data: SocketMessage) => {
-      this.messageSubject.next(data);
+      this.messages.push({
+        ...data,
+        isMe: data.senderId === this.id
+      });
     });
+
+    this.socket.on(SOCKET_SYSTEM_EVENT, (data:SystemEvent) => {
+      this.logger.debug("received system event:", data);
+      if(isSystemYouAre(data)) {
+        this.id = data.id;
+        this.name = data.name;
+        this.isRoomOwner = data.owner;
+      }
+    })
+
+
   }
 
   public createGame(namespace: string, password?: string) {
@@ -75,10 +96,6 @@ export class GameService {
 
   public subscribePlayerData<T extends PlayerData>(observerOrNext?: Partial<Observer<T | undefined>> | ((value: T | undefined) => void)) {
     return this.playerDataSubject.subscribe(observerOrNext);
-  }
-
-  public subscribeMessages(observerOrNext?: Partial<Observer<SocketMessage>> | ((value: SocketMessage) => void)) {
-    return this.messageSubject.subscribe(observerOrNext);
   }
 
   public async gameExists(hash: string) {

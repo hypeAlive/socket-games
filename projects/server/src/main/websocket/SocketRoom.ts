@@ -1,13 +1,14 @@
 import {Server, Socket} from "socket.io";
 import LoggingUtils from "../utils/LoggingUtils.js";
 import {
+    createSystemYouAre,
     Events,
     GameId,
     PlayerId, SOCKET_DISCONNECT,
     SOCKET_GAME_EVENT,
     SOCKET_JOIN_ACCEPT,
-    SOCKET_JOIN_ERROR, SOCKET_MESSAGE,
-    SocketJoin, SocketMessage
+    SOCKET_JOIN_ERROR, SOCKET_MESSAGE, SOCKET_SYSTEM_EVENT,
+    SocketJoin, SocketMessage, SystemEvent, SystemYouAre
 } from "socket-game-types";
 import AuthUtil from "../utils/AuthUtil.js";
 import {RoomNeeds} from "socket-game-types/src/websocket/room.type.js";
@@ -39,6 +40,7 @@ export default class SocketRoom {
     private endSub: Subscription | undefined;
     private clientIdDataMap: Map<string, SocketUserData> = new Map();
     private roomOwnerClientId: string | undefined;
+
 
     constructor(roomData: SocketRoomData, socket: Server, gameHandler: GameHandler) {
         this.roomData = roomData;
@@ -105,13 +107,22 @@ export default class SocketRoom {
     public message(client: any, message: string) {
         const name = this.clientIdDataMap.get(client.id)?.name;
         if (!name) return;
+        this.sendMessage(name, message, AuthUtil.hashClientId(client.id));
+    }
+
+    private sendMessage(sender: string, message: string, senderId: string = "sys") {
         this.socket.of('socket')
             .to(this.roomData.roomHash)
             .emit(SOCKET_MESSAGE, {
-                sender: name,
+                sender: sender,
+                senderId: senderId,
                 message: message,
                 timestamp: new Date().getTime()
             } as SocketMessage);
+    }
+
+    public sendSystemMessage(message: string) {
+        this.sendMessage("System", message);
     }
 
     public cleanUpGame() {
@@ -200,21 +211,51 @@ export default class SocketRoom {
             return false;
         }
         client.emit(SOCKET_JOIN_ACCEPT, this.roomData.roomHash);
+        const youAre = createSystemYouAre(data.name, AuthUtil.hashClientId(client.id), false);
+
+
+        this.sendSystemMessage(`${data.name} joined the room 👤`);
         LOGGER.debug(`Client joined room ${this.roomData.roomHash} 👤`);
+
+        if (!this.roomOwnerClientId) {
+            this.roomOwnerClientId = client.id;
+            this.sendSystemMessage(`${data.name} is now the room owner 👑`);
+            youAre.owner = true;
+        }
+
+        this.sendSystemEvent(client.id, youAre);
+
         return true;
     }
 
+    private sendSystemEvent(socketId: string, event: SystemEvent) {
+        this.socket.of('socket')
+            .to(socketId)
+            .emit(SOCKET_SYSTEM_EVENT, event);
+    }
+
     private removeClientData(clientId: string) {
+        const data = this.clientIdDataMap.get(clientId);
+        if(!data) return undefined;
         this.clientIdDataMap.delete(clientId);
         LOGGER.debug(`Client data removed for ${clientId} 🗑`);
+        return data;
     }
 
     public leave(client: any) {
         try {
             this.leaveGame(client.id);
-            this.removeClientData(client.id);
+            const data = this.removeClientData(client.id);
+            if(data) {
+                this.sendSystemMessage(`${data.name} left the room 👤`);
+            }
             if (client.id === this.roomOwnerClientId) {
                 this.roomOwnerClientId = this.findNewOwner();
+                if (!this.roomOwnerClientId) return;
+                const data = this.clientIdDataMap.get(this.roomOwnerClientId);
+                if(!data) return;
+                this.sendSystemMessage(`${data.name} is now the room owner 👑`);
+                this.sendSystemEvent(this.roomOwnerClientId, createSystemYouAre(data.name, AuthUtil.hashClientId(data.id), true));
             }
         } catch (e) {
             LOGGER.error(e);
@@ -234,9 +275,6 @@ export default class SocketRoom {
         });
         LOGGER.info(`Client data set for ${client.id} 📝`);
         LOGGER.debug(this.clientIdDataMap.get(client.id));
-
-        if (this.roomOwnerClientId) return;
-        this.roomOwnerClientId = client.id;
     }
 
     public getHash(): string {

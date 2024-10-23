@@ -26,7 +26,7 @@
   dark:[&::-webkit-scrollbar-track]:bg-neutral-700
   dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
        #messageContainer>
-    <game-chat-message *ngFor="let message of messages" [message]="message"/>
+    <game-chat-message *ngFor="let message of messages" [message]="message" [isRightAligned]="message.isMe"/>
   </div>
 
   <game-chat-input/>
@@ -42,4 +42,7 @@
         #openButton>
   <ng-icon class="text-3xl" name="hugeBubbleChat"></ng-icon>
   <span class="sr-only">Open Chat</span>
+  <div *ngIf="hasNewMessages"
+       class="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -end-2 dark:border-gray-900"
+  >{{ newMessagesCount }}</div>
 </button>

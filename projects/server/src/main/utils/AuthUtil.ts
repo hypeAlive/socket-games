@@ -17,4 +17,7 @@ export default class AuthUtil {
         return hash === inputHash;
     }
 
+    public static hashClientId(clientId: string): string {
+        return crypto.createHash('sha256').update(clientId).digest('hex');
+    }
 }

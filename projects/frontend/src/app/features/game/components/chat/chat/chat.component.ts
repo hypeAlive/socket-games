@@ -7,7 +7,7 @@ import {ChatMessageComponent} from '../chat-message/chat-message.component';
 import {animate, state, style, transition, trigger } from '@angular/animations';
 import {Subscription} from 'rxjs';
 import * as console from 'node:console';
-import {GameService} from '../../../../../shared/services/game.service';
+import {FrontendMessage, GameService} from '../../../../../shared/services/game.service';
 import {SocketMessage} from 'socket-game-types';
 
 @Component({
@@ -38,24 +38,24 @@ import {SocketMessage} from 'socket-game-types';
     ])
   ]
 })
-export class ChatComponent implements AfterViewInit, OnInit, OnDestroy {
+export class ChatComponent implements AfterViewInit {
 
   @ViewChild('messageContainer') messageContainer!: ElementRef;
   @ViewChild('chatContainer') chatContainer!: ElementRef;
   @ViewChild('openButton') openButton!: ElementRef;
+
+  private currentMessage = 0;
 
   constructor(private game: GameService) {
   }
 
   private hideOnOutsideClick = false;
 
-  protected messages: SocketMessage[] = [];
-  private messageSub!: Subscription;
-
   protected isChatOpen = false;
 
   protected toggleChat() {
     this.isChatOpen = !this.isChatOpen;
+    this.currentMessage = this.messages.length;
   }
 
   @HostListener('document:click', ['$event'])
@@ -75,13 +75,16 @@ export class ChatComponent implements AfterViewInit, OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
+  protected get messages(): FrontendMessage[] {
+    return this.game.messages;
   }
 
-  ngOnInit(): void {
-    this.messageSub = this.game.subscribeMessages((message) => {
-      this.messages.push(message);
-    });
+  protected get hasNewMessages(): boolean {
+    return this.newMessagesCount > 0;
+  }
+
+  protected get newMessagesCount(): number {
+    return this.game.messages.length - this.currentMessage;
   }
 
 }

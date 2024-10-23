@@ -25,7 +25,7 @@ import {GameInputBase} from '../../directives/game-input-base.directive';
 })
 export class LobbyComponent extends GameInputBase<GameData, PlayerData> implements OnInit{
 
-  constructor() {
+  constructor(private game: GameService) {
     super();
   }
 
@@ -43,6 +43,10 @@ export class LobbyComponent extends GameInputBase<GameData, PlayerData> implemen
 
   protected get gameTitle() {
     return this.cmsGame.translations[0].title;
+  }
+
+  protected get isOwner() {
+    return this.game.isRoomOwner;
   }
 
   startGame() {

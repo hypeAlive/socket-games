@@ -27,7 +27,7 @@
     <div class="text-center mb-8 text-gray-900 dark:text-white">
       {{ minPlayers - players.length }} more player(s) needed
     </div>
-    <div class="flex justify-center">
+    <div *ngIf="isOwner" class="flex justify-center">
       <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" [disabled]="players.length < minPlayers" (click)="startGame()">
         Start Game
       </button>
