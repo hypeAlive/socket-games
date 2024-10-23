@@ -19,7 +19,7 @@ import {
   GameEvent,
   PlayerData,
   SOCKET_MESSAGE,
-  SocketMessage, SOCKET_SYSTEM_EVENT, SystemEvent, isSystemYouAre
+  SocketMessage, SOCKET_SYSTEM_EVENT, SystemEvent, isSystemYouAre, SOCKET_GAME_START, PlayerAction, SOCKET_GAME_ACTION
 } from 'socket-game-types';
 import {BehaviorSubject, lastValueFrom, Observer, Subject} from 'rxjs';
 import {RoomNeeds} from 'socket-game-types/src/websocket/room.type';
@@ -56,8 +56,10 @@ export class GameService {
 
     this.socket.on(SOCKET_GAME_EVENT, (data: Event<any, any>) => {
       if(isGameEvent(data)) {
+        this.logger.debug("received game event:", data);
         this.gameDataSubject.next(data['data']);
       } else if (isPlayerEvent(data)) {
+        this.logger.debug("received player event:", data);
         this.playerDataSubject.next(data['data']);
       } else
         this.logger.debug("received unknown event:", data);
@@ -80,6 +82,16 @@ export class GameService {
     })
 
 
+  }
+
+  public sendAction(action: PlayerAction) {
+    this.socket.emit(SOCKET_GAME_ACTION, action);
+  }
+
+  public sendStartGame() {
+    if (!this.roomHash) return;
+    if (!this.isRoomOwner) return;
+    this.socket.emit(SOCKET_GAME_START, {})
   }
 
   public createGame(namespace: string, password?: string) {

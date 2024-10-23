@@ -50,8 +50,9 @@ export class LobbyComponent extends GameInputBase<GameData, PlayerData> implemen
   }
 
   startGame() {
-    // Logic to start the game
-    console.log('Game started');
+    if(this.isOwner) {
+      this.game.sendStartGame();
+    }
   }
 
   ngOnInit(): void {

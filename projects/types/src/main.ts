@@ -24,7 +24,9 @@ import {
     isSystemYouAre,
     SystemYouAre,
     SystemEvent,
-    createSystemYouAre
+    createSystemYouAre,
+    SOCKET_GAME_START,
+    SOCKET_GAME_ACTION
 } from "./websocket/socket.type.js";
 
 
@@ -54,5 +56,7 @@ export {
     isSystemYouAre,
     SystemYouAre,
     SystemEvent,
-    createSystemYouAre
+    createSystemYouAre,
+    SOCKET_GAME_START,
+    SOCKET_GAME_ACTION
 };

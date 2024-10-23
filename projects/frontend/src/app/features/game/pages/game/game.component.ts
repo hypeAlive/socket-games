@@ -3,12 +3,14 @@ import {ChatComponent} from '../../components/chat/chat/chat.component';
 import {ChatMessageComponent} from '../../components/chat/chat-message/chat-message.component';
 import {ChatInputComponent} from '../../components/chat/chat-input/chat-input.component';
 import {ActivatedRoute, RouterOutlet} from '@angular/router';
-import {NgComponentOutlet} from '@angular/common';
+import {NgComponentOutlet, NgIf} from '@angular/common';
 import {LobbyComponent} from '../lobby/lobby.component';
 import {GameService} from '../../../../shared/services/game.service';
 import {Subscription} from 'rxjs';
 import {GameData, GameState, PlayerData} from 'socket-game-types';
 import {CmsGame} from '../../../home/models/games.interface';
+import {TikTakToeComponent} from '../tik-tak-toe/tik-tak-toe.component';
+import {CurrentTurnComponent} from '../../components/current-turn/current-turn.component';
 
 @Component({
   selector: 'app-game',
@@ -18,7 +20,9 @@ import {CmsGame} from '../../../home/models/games.interface';
     ChatMessageComponent,
     ChatInputComponent,
     RouterOutlet,
-    NgComponentOutlet
+    NgComponentOutlet,
+    CurrentTurnComponent,
+    NgIf
   ],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss'
@@ -27,8 +31,8 @@ export default class GameComponent implements OnInit, OnDestroy {
 
   private gameDataSub!: Subscription;
   private playerDataSub!: Subscription;
-  private gameData: GameData | undefined;
-  private playerData: PlayerData | undefined;
+  protected gameData: GameData | undefined;
+  protected playerData: PlayerData | undefined;
   private cmsGame!: CmsGame;
 
   constructor(private game: GameService, private route: ActivatedRoute) {
@@ -38,12 +42,12 @@ export default class GameComponent implements OnInit, OnDestroy {
   }
 
   protected get gameComponent() {
-    if(!this.gameData) return {
+    if (!this.gameData) return {
       component: null,
       inputs: {}
     };
 
-    if(this.gameData.state === GameState.WAITING)
+    if (this.gameData.state === GameState.WAITING)
       return {
         component: LobbyComponent,
         inputs: {
@@ -53,10 +57,38 @@ export default class GameComponent implements OnInit, OnDestroy {
         }
       }
 
+    if (this.isGameState(GameState.RUNNING)) {
+      const component = this.getComponentFromGameKey(this.cmsGame.unique_code);
+      if (component) {
+        return {
+          component: component,
+          inputs: {
+            gameData: this.gameData,
+            playerData: this.playerData,
+            cmsGame: this.cmsGame
+          }
+        }
+      }
+    }
+
     return {
       component: null,
       inputs: {}
     };
+  }
+
+  protected isGameState(state: GameState) {
+    if(!this.gameData) return false;
+    return this.gameData.state === state;
+  }
+
+  private getComponentFromGameKey(gameKey: string): Type<any> | null {
+    switch (gameKey) {
+      case 'tiktaktoe':
+        return TikTakToeComponent;
+      default:
+        return null;
+    }
   }
 
   ngOnInit(): void {
@@ -70,6 +102,8 @@ export default class GameComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.gameDataSub.unsubscribe();
+    this.playerDataSub.unsubscribe();
   }
 
+  protected readonly GameState = GameState;
 }

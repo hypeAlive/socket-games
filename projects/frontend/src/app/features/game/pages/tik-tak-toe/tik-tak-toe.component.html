@@ -2,12 +2,22 @@
   <div class="bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-10 max-w-md mx-auto">
     <h2 class="text-3xl font-semibold mb-8 text-center text-gray-900 dark:text-white">Tic Tac Toe</h2>
     <div class="grid grid-cols-3 gap-4">
-      <div *ngFor="let cell of board" class="w-24 h-24 bg-gray-300 dark:bg-gray-600 rounded-lg flex items-center justify-center">
-        <div [ngClass]="{
-          'text-red-500': cell === 'X',
-          'text-yellow-500': cell === 'O',
-          'text-transparent': cell === null
-        }" class="text-5xl font-bold">{{ cell || '' }}</div>
+      <div *ngFor="let row of board; let rowIndex = index" class="flex flex-col gap-4">
+        <div *ngFor="let cell of row; let colIndex = index"
+             class="w-24 h-24 bg-gray-300 dark:bg-gray-600 rounded-lg flex items-center justify-center"
+             [ngClass]="{
+                'hover:bg-gray-400 dark:hover:bg-gray-700': canClickCell(rowIndex, colIndex),
+                'active:bg-gray-500 dark:active:bg-gray-800': canClickCell(rowIndex, colIndex),
+             }"
+             (click)="handleClickCell(rowIndex, colIndex)">
+          <div [ngClass]="{
+            'text-blue-700': isPlayer1Cell(cell),
+            'text-red-700': isPlayer2Cell(cell),
+          }" class="flex items-center">
+            <ng-icon class="text-7xl" *ngIf="isPlayer1Cell(cell)" name="hugeMultiplicationSign" strokeWidth="3"></ng-icon>
+            <ng-icon class="text-6xl" *ngIf="isPlayer2Cell(cell)" name="hugeCircle" strokeWidth="3"></ng-icon>
+          </div>
+        </div>
       </div>
     </div>
   </div>

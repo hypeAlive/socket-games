@@ -3,7 +3,7 @@ import LoggingUtils from "../utils/LoggingUtils.js";
 import {
     createSystemYouAre,
     Events,
-    GameId,
+    GameId, PlayerAction,
     PlayerId, SOCKET_DISCONNECT,
     SOCKET_GAME_EVENT,
     SOCKET_JOIN_ACCEPT,
@@ -125,6 +125,18 @@ export default class SocketRoom {
         this.sendMessage("System", message);
     }
 
+    public start(client: any) {
+        if(!this.game) return;
+        if (client.id !== this.roomOwnerClientId) return;
+
+        try {
+            this.gameHandler.start(this.game);
+            this.sendSystemMessage("Game started 🎮");
+        } catch (e) {
+            LOGGER.error(e);
+        }
+    }
+
     public cleanUpGame() {
         this.clientIdDataMap.forEach((data) => {
             this.leaveGame(data.id);
@@ -171,11 +183,27 @@ export default class SocketRoom {
 
         if (!clientData.playerId) return;
 
-        this.gameHandler.leave(clientData.playerId);
+        try {
+            this.gameHandler.leave(clientData.playerId);
+        } catch (e) {
+            LOGGER.error(e);
+        }
         this.clientIdDataMap.set(clientId, {
             ...clientData,
             playerId: undefined
         });
+    }
+
+    public action(client: any, action: PlayerAction) {
+        if (!this.game) return;
+        const clientData = this.clientIdDataMap.get(client.id);
+        if (!clientData) return;
+        if (!clientData.playerId) return;
+        try {
+            this.gameHandler.sendAction(this.game, clientData.playerId, action);
+        } catch (e) {
+            LOGGER.error(e);
+        }
     }
 
     private get needsPassword(): boolean {

@@ -1,4 +1,13 @@
-import {Events, GameId, PlayerId, SOCKET_DISCONNECT, SOCKET_JOIN, SOCKET_MESSAGE, SocketJoin} from "socket-game-types";
+import {
+    Events,
+    GameId, PlayerAction,
+    PlayerId,
+    SOCKET_DISCONNECT, SOCKET_GAME_ACTION,
+    SOCKET_GAME_START,
+    SOCKET_JOIN,
+    SOCKET_MESSAGE,
+    SocketJoin
+} from "socket-game-types";
 import {Subscription} from "rxjs";
 import {Server} from "socket.io";
 import GameHandler from "../base/GameHandler.js";
@@ -74,9 +83,9 @@ export default class GameSocketManager {
         this.clientGamePlayerMap.set(client.id, undefined);
 
         client.on(SOCKET_JOIN, (data:any) => this.handleJoin(client, data));
-        client.on("action", (action:any) => this.handleAction(client, action));
+        client.on(SOCKET_GAME_ACTION, (action:PlayerAction) => this.handleAction(client, action));
         client.on("leave", () => this.handleLeave(client));
-        client.on("start", () => this.handleStart(client));
+        client.on(SOCKET_GAME_START, () => this.handleStart(client));
         client.on(SOCKET_MESSAGE, (message: string) => this.handleMessage(client, message));
         client.on(SOCKET_DISCONNECT, () => this.handleDisconnect(client));
 
@@ -144,18 +153,12 @@ export default class GameSocketManager {
         }
     }
 
-    private handleAction(socket: any, action: any) {
-        const playerId = this.getPlayerId(socket);
-        if (!playerId) {
-            socket.emit("error", {message: "not in a game"});
-            return;
-        }
-        try {
-            const gameId = playerId[0];
-            this.gameHandler.sendAction(gameId, playerId, action);
-        } catch (e: any) {
-            socket.emit("error", {message: e.message});
-        }
+    private handleAction(client: any, action: PlayerAction) {
+        const roomHash = this.clientRoomMap.get(client.id);
+        if(!roomHash) return;
+        const room = this.rooms.get(roomHash);
+        if(!room) return;
+        room.action(client, action);
     }
 
     private handleLeave(socket: any) {
@@ -177,7 +180,13 @@ export default class GameSocketManager {
         }
     }
 
-    private handleStart(socket: any) {
+    private handleStart(client: any) {
+        const roomHash = this.clientRoomMap.get(client.id);
+        if(!roomHash) return;
+        const room = this.rooms.get(roomHash);
+        if(!room) return;
+        room.start(client);
+        /*
         const playerId = this.getPlayerId(socket);
         if (!playerId) {
             socket.emit("error", {message: "not in a game"});
@@ -189,6 +198,8 @@ export default class GameSocketManager {
         } catch (e: any) {
             socket.emit("error", {message: e.message});
         }
+
+         */
     }
 
     private handleDisconnect(client: any) {

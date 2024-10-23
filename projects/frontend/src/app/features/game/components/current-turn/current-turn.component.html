@@ -1,0 +1,10 @@
+<div class="current-turn-container text-center text-xl text-gray-800 dark:text-gray-200">
+  <p *ngIf="isMyTurn(); else otherPlayerTurn">
+    It's your turn!
+  </p>
+  <ng-template #otherPlayerTurn>
+    <p>
+      It's {{ gameData.players[gameData.currentPlayerIndex]?.name }}'s turn.
+    </p>
+  </ng-template>
+</div>

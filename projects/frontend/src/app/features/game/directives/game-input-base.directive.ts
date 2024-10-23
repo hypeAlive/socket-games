@@ -3,6 +3,7 @@ import {GameData, PlayerData} from 'socket-game-types';
 import {CmsGame} from '../../home/models/games.interface';
 import {ToastrService} from 'ngx-toastr';
 import {ActivatedRoute, Router} from '@angular/router';
+import {GameService} from '../../../shared/services/game.service';
 
 @Directive()
 export class GameInputBase<GD extends GameData, PD extends PlayerData> {
@@ -21,6 +22,11 @@ export class GameInputBase<GD extends GameData, PD extends PlayerData> {
 
   protected get hash() {
     return this.route.snapshot.paramMap.get('hash');
+  }
+
+  protected isMyTurn() {
+    if(this.gameData.currentPlayerIndex === -1) return false;
+    return this.gameData.players[this.gameData.currentPlayerIndex].playerId[1] === this.playerData.playerId[1];
   }
 
   protected copyLinkToClipboard() {
