@@ -174,6 +174,8 @@ export default abstract class BaseGame<PD extends PlayerData, GD extends GameDat
     public join(playerId?: PlayerId): PlayerId {
         if (!this.isInitialized()) throw new GameError("Game not initialized");
 
+        //todo: check if game is full
+
         playerId = playerId ? playerId : this.createPlayerId();
         const player = new GamePlayer(playerId, this, this.initialPlayerData);
         this.players.push(player);
