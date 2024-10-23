@@ -9,6 +9,8 @@ import {HeaderComponent} from './components/header/header.component';
 import {FooterComponent} from './components/footer/footer.component';
 import {initFlowbite} from 'flowbite';
 import {DirectusService} from './services/directus.service';
+import {provideToastr} from 'ngx-toastr';
+import {provideAnimations} from '@angular/platform-browser/animations';
 
 const httpInterceptorProviders = [
   {provide: HTTP_INTERCEPTORS, useClass: EnsureHttpInterceptor, multi: true},
@@ -19,6 +21,8 @@ export const provideCoreServices = () => [
   ...httpInterceptorProviders,
   DirectusService,
   { provide: TitleStrategy, useClass: CoreTitleStrategy },
+  provideAnimations(),
+  provideToastr()
 ];
 
 

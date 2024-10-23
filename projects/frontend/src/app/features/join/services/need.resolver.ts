@@ -3,13 +3,17 @@ import {ActivatedRouteSnapshot, Resolve, Router, RouterStateSnapshot} from '@ang
 import {NGXLogger} from "ngx-logger";
 import {CmsGame} from '../../home/models/games.interface';
 import {GameService} from '../../../shared/services/game.service';
+import {ToastrService} from 'ngx-toastr';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NeedResolver implements Resolve<Promise<CmsGame>> {
 
-  constructor(private router: Router, private logger: NGXLogger, private game: GameService) {
+  constructor(private router: Router,
+              private logger: NGXLogger,
+              private game: GameService,
+              private toastr: ToastrService) {
   }
 
   async resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<any> {
@@ -18,6 +22,7 @@ export class NeedResolver implements Resolve<Promise<CmsGame>> {
     console.log("need:" + hash);
     if (!hash) {
       await this.router.navigate(['/']);
+      this.logger.error(`No game hash provided`);
       return;
     }
 
@@ -27,14 +32,13 @@ export class NeedResolver implements Resolve<Promise<CmsGame>> {
       return navigation.extras.state['needs'];
     }
 
-    console.log(state)
-
     try {
       let needs = await this.game.gameNeeds(hash);
       await this.router.navigate([state.url], { state: { needs: needs } });
     } catch (error) {
       console.error(error);
       await this.router.navigate(['/']);
+      this.toastr.error(`Error while joining ${hash}`);
     }
   }
 }

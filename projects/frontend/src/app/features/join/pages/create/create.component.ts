@@ -6,6 +6,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {CmsGame} from '../../../home/models/games.interface';
 import {GameService} from '../../../../shared/services/game.service';
 import {SocketJoin} from 'socket-game-types';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-create-page',
@@ -25,7 +26,11 @@ export default class CreateComponent implements OnInit, AfterViewInit {
   protected isLoading: boolean = false;
   private exampleName: string = 'Player';
 
-  constructor(private fb: FormBuilder, private socket: GameService, private route: ActivatedRoute, private router: Router) {
+  constructor(private fb: FormBuilder,
+              private socket: GameService,
+              private route: ActivatedRoute,
+              private router: Router,
+              private toastr: ToastrService) {
     this.route.data.subscribe(data => {
       this.gameData = data['game'];
       this.exampleName = data['exampleName'];
@@ -47,6 +52,7 @@ export default class CreateComponent implements OnInit, AfterViewInit {
     this.isLoading = true;
     this.socket.createGame(this.gameData.unique_code, this.needPassword ? this.createForm.controls['password'].value : undefined)
       .then(async (data) => {
+        this.toastr.success('Created Game ' + data.hash);
         await this.router.navigate(['/join', data.hash], {
           state: {
             join: {

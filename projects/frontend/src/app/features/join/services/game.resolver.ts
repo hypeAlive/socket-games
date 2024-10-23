@@ -4,13 +4,17 @@ import {NGXLogger} from "ngx-logger";
 import {DirectusService} from "../../../core/services/directus.service";
 import {CmsGame} from '../../home/models/games.interface';
 import {RoomNeeds} from 'socket-game-types/dist/src/websocket/room.type';
+import { ToastrService } from 'ngx-toastr';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GameResolver implements Resolve<Promise<CmsGame>> {
 
-  constructor(private router: Router, private logger: NGXLogger, private directus: DirectusService) {
+  constructor(private router: Router,
+              private logger: NGXLogger,
+              private directus: DirectusService,
+              private toastr: ToastrService) {
   }
 
   async resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<any> {
@@ -33,10 +37,12 @@ export class GameResolver implements Resolve<Promise<CmsGame>> {
         })
         .catch(async () => {
           await this.router.navigate(['/']);
+          this.toastr.error(`Game ${needs.namespace} does not exist`);
           return;
         });
     }
 
     await this.router.navigate(['/']);
+    this.toastr.error(`No game hash provided`);
   }
 }

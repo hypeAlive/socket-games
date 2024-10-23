@@ -25,7 +25,6 @@ export const appConfig: ApplicationConfig = {
         level: environment.logLevel
       })
     ),
-    provideAnimations(),
     provideRouter(routes),
     { provide: LOCALE_ID, useValue: localeFactory() },
   ]
