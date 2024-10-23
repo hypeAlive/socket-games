@@ -7,7 +7,7 @@ import {NgComponentOutlet} from '@angular/common';
 import {LobbyComponent} from '../lobby/lobby.component';
 import {GameService} from '../../../../shared/services/game.service';
 import {Subscription} from 'rxjs';
-import {GameData, GameState} from 'socket-game-types';
+import {GameData, GameState, PlayerData} from 'socket-game-types';
 import {CmsGame} from '../../../home/models/games.interface';
 
 @Component({
@@ -26,7 +26,9 @@ import {CmsGame} from '../../../home/models/games.interface';
 export default class GameComponent implements OnInit, OnDestroy {
 
   private gameDataSub!: Subscription;
+  private playerDataSub!: Subscription;
   private gameData: GameData | undefined;
+  private playerData: PlayerData | undefined;
   private cmsGame!: CmsGame;
 
   constructor(private game: GameService, private route: ActivatedRoute) {
@@ -46,6 +48,7 @@ export default class GameComponent implements OnInit, OnDestroy {
         component: LobbyComponent,
         inputs: {
           gameData: this.gameData,
+          playerData: this.playerData,
           cmsGame: this.cmsGame
         }
       }
@@ -59,7 +62,10 @@ export default class GameComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.gameDataSub = this.game.subscribeGameData((data) => {
       this.gameData = data;
-    })
+    });
+    this.playerDataSub = this.game.subscribePlayerData((data) => {
+      this.playerData = data;
+    });
   }
 
   ngOnDestroy(): void {

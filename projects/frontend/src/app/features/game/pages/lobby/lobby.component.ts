@@ -23,7 +23,7 @@ import {GameInputBase} from '../../directives/game-input-base.directive';
     })
   ]
 })
-export class LobbyComponent extends GameInputBase<GameData, PlayerData> {
+export class LobbyComponent extends GameInputBase<GameData, PlayerData> implements OnInit{
 
   constructor() {
     super();
@@ -48,5 +48,10 @@ export class LobbyComponent extends GameInputBase<GameData, PlayerData> {
   startGame() {
     // Logic to start the game
     console.log('Game started');
+  }
+
+  ngOnInit(): void {
+    console.log("gameData", this.gameData);
+    console.log("playerData", this.playerData);
   }
 }

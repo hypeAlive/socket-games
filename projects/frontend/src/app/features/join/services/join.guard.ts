@@ -37,6 +37,7 @@ export class JoinGuard implements CanMatch {
       return false;
     }
 
+
     const navigation = this.router.getCurrentNavigation();
 
     if (navigation?.extras?.state?.['join']) {
@@ -52,6 +53,8 @@ export class JoinGuard implements CanMatch {
         });
         this.toastr.success(`Successfully joined game ${hash}`);
         return false;
+      } else {
+        this.toastr.error(`Failed to join game ${hash}`);
       }
     }
 

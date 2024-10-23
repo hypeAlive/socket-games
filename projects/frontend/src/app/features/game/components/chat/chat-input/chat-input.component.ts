@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {GameService} from '../../../../../shared/services/game.service';
 
 @Component({
   selector: 'game-chat-input',
@@ -13,13 +14,14 @@ import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
 export class ChatInputComponent {
   protected chatForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private game: GameService) {
     this.chatForm = this.fb.group({
       message: ['']
     });
   }
 
   onSubmit() {
-    console.log(this.chatForm.value);
+    this.game.sendMessage(this.chatForm.value.message);
+    this.chatForm.reset();
   }
 }

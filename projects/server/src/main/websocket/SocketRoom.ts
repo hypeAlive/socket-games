@@ -191,12 +191,11 @@ export default class SocketRoom {
 
         client.join(this.roomData.roomHash);
         try {
-            setTimeout(() => {
-                this.setClientData(client, data);
-                this.joinGame(client.id);
-            }, 0);
+            this.setClientData(client, data);
+            this.joinGame(client.id);
         } catch (e) {
             client.leave(this.roomData.roomHash);
+            this.removeClientData(client.id);
             client.emit(SOCKET_JOIN_ERROR, e);
             return false;
         }
@@ -205,9 +204,15 @@ export default class SocketRoom {
         return true;
     }
 
+    private removeClientData(clientId: string) {
+        this.clientIdDataMap.delete(clientId);
+        LOGGER.debug(`Client data removed for ${clientId} 🗑`);
+    }
+
     public leave(client: any) {
         try {
             this.leaveGame(client.id);
+            this.removeClientData(client.id);
             if (client.id === this.roomOwnerClientId) {
                 this.roomOwnerClientId = this.findNewOwner();
             }

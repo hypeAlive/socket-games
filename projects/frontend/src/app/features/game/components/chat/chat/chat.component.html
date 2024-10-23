@@ -26,13 +26,7 @@
   dark:[&::-webkit-scrollbar-track]:bg-neutral-700
   dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
        #messageContainer>
-    <game-chat-message/>
-    <game-chat-message [isRightAligned]="true"/>
-    <game-chat-message/>
-    <game-chat-message [isRightAligned]="true"/>
-    <game-chat-message/>
-    <game-chat-message [isRightAligned]="true"/>
-    <game-chat-message/>
+    <game-chat-message *ngFor="let message of messages" [message]="message"/>
   </div>
 
   <game-chat-input/>

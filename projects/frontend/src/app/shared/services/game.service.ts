@@ -5,16 +5,26 @@ import {environment} from '../../../environment/environment';
 import {
   ApiCreateGame,
   ApiGameHash,
-  SOCKET_DISCONNECT, SOCKET_GAME_EVENT,
+  SOCKET_DISCONNECT,
+  SOCKET_GAME_EVENT,
   SOCKET_JOIN,
   SOCKET_JOIN_ACCEPT,
   SOCKET_JOIN_ERROR,
   Event,
-  SocketJoin, GameData, TikTakToeGameData, isGameEvent, isPlayerEvent, GameEvent, PlayerData
+  SocketJoin,
+  GameData,
+  TikTakToeGameData,
+  isGameEvent,
+  isPlayerEvent,
+  GameEvent,
+  PlayerData,
+  SOCKET_MESSAGE,
+  SocketMessage
 } from 'socket-game-types';
-import {BehaviorSubject, lastValueFrom, Observer} from 'rxjs';
+import {BehaviorSubject, lastValueFrom, Observer, Subject} from 'rxjs';
 import {RoomNeeds} from 'socket-game-types/src/websocket/room.type';
 import {NGXLogger} from 'ngx-logger';
+import {ToastrService} from 'ngx-toastr';
 
 @Injectable({
   providedIn: 'root'
@@ -25,8 +35,10 @@ export class GameService {
   private roomHash: string | undefined;
   private gameDataSubject: BehaviorSubject<any | undefined> = new BehaviorSubject<any | undefined>(undefined);
   private playerDataSubject: BehaviorSubject<any | undefined> = new BehaviorSubject<any | undefined>(undefined);
+  private messageSubject: Subject<SocketMessage> = new Subject<SocketMessage>();
 
-  constructor(private http: HttpClient, private logger: NGXLogger) {
+  constructor(private http: HttpClient,
+              private logger: NGXLogger) {
     this.socket = io(environment.socketUrl, {
       autoConnect: false
     });
@@ -42,6 +54,10 @@ export class GameService {
         this.playerDataSubject.next(data['data']);
       } else
         this.logger.debug("received unknown event:", data);
+    });
+
+    this.socket.on(SOCKET_MESSAGE, (data: SocketMessage) => {
+      this.messageSubject.next(data);
     });
   }
 
@@ -61,6 +77,10 @@ export class GameService {
     return this.playerDataSubject.subscribe(observerOrNext);
   }
 
+  public subscribeMessages(observerOrNext?: Partial<Observer<SocketMessage>> | ((value: SocketMessage) => void)) {
+    return this.messageSubject.subscribe(observerOrNext);
+  }
+
   public async gameExists(hash: string) {
     try {
       await lastValueFrom(this.http.get(`${environment.apiUrl}/exists/${hash}`, {responseType: 'text'}));
@@ -76,6 +96,11 @@ export class GameService {
 
   private connect() {
     this.socket.connect();
+  }
+
+  public sendMessage(message: string) {
+    if(!this.roomHash) return;
+    this.socket.emit(SOCKET_MESSAGE, message);
   }
 
   public isInRoom(hash: string) {
