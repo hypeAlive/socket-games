@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {NgForOf, NgIf} from '@angular/common';
 import {NgIcon, provideIcons} from '@ng-icons/core';
 import {hugePlusSign, hugeUser} from '@ng-icons/huge-icons';

@@ -5,10 +5,7 @@ import {NgClass, NgForOf, NgIf} from '@angular/common';
 import {ChatInputComponent} from '../chat-input/chat-input.component';
 import {ChatMessageComponent} from '../chat-message/chat-message.component';
 import {animate, state, style, transition, trigger } from '@angular/animations';
-import {Subscription} from 'rxjs';
-import * as console from 'node:console';
 import {FrontendMessage, GameService} from '../../../../../shared/services/game.service';
-import {SocketMessage} from 'socket-game-types';
 
 @Component({
   selector: 'game-chat-sidebar',
