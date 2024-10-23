@@ -57,9 +57,9 @@ export default class GameHandler {
      * @param playerId
      * @returns The id of the player that joined the game.
      */
-    public join(gameId: GameId, playerId?: PlayerId): PlayerId {
+    public join(gameId: GameId, playerName: string, playerId?: PlayerId): PlayerId {
         return this.getGameById(gameId)
-            .map(game => game.join(playerId))
+            .map(game => game.join(playerName, playerId))
             .orElseThrow("Game not found");
     }
 

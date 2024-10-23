@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {WindowComponent} from '../../components/window/window.component';
 import {NgIf} from '@angular/common';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
@@ -18,16 +18,18 @@ import {RoomNeeds} from 'socket-game-types/dist/src/websocket/room.type';
   templateUrl: './join.component.html',
   styles: []
 })
-export default class JoinComponent implements OnInit{
+export default class JoinComponent implements OnInit, AfterViewInit {
 
   protected joinForm: FormGroup;
   private gameData!: CmsGame;
   private needs!: RoomNeeds;
+  private exampleName: string = 'Player';
 
   constructor(private fb: FormBuilder, private router: Router, private route: ActivatedRoute) {
     this.route.data.subscribe(data => {
       this.gameData = data['game'];
       this.needs = data['needs'];
+      this.exampleName = data['exampleName'];
     });
     this.joinForm = this.fb.group({
       username: ['', Validators.required],
@@ -66,6 +68,16 @@ export default class JoinComponent implements OnInit{
   ngOnInit(): void {
     console.log("gameData", this.gameData);
     console.log("needs", this.needs);
+  }
+
+  ngAfterViewInit(): void {
+    this.joinForm.controls['username'].setValue(this.exampleName);
+  }
+
+  clearPlaceholder(): void {
+    if (this.joinForm.controls['username'].value === this.exampleName) {
+      this.joinForm.controls['username'].setValue('');
+    }
   }
 
 }

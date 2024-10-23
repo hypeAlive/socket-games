@@ -1,4 +1,4 @@
-import {PlayerId} from "./player.type.js";
+import {PlayerData, PlayerId} from "./player.type.js";
 
 /**
  * Unique identifier for a Game.
@@ -18,6 +18,7 @@ export enum GameState {
 export type GameData = {
     gameId: GameId,
     playerIds: PlayerId[],
+    players: PlayerData[],
     minPlayers: number,
     maxPlayers: number,
     state: GameState,

@@ -65,8 +65,8 @@ describe('ConnectFour Tests', () => {
         let playerTwo: PlayerId;
 
         beforeEach(() => {
-            playerOne = game.join();
-            playerTwo = game.join();
+            playerOne = game.join("");
+            playerTwo = game.join("");
             anyGame.start();
         });
 
@@ -86,8 +86,8 @@ describe('ConnectFour Tests', () => {
         describe('#fill column', () => {
 
             it('should fill a column', () => {
-                const playerOne = game.join();
-                const playerTwo = game.join();
+                const playerOne = game.join("");
+                const playerTwo = game.join("");
                 
                 const actionsPlayerOne = [{x: 0}, {x: 0}, {x: 0}, {x: 0}];
                 const actionsPlayerTwo = [{x: 0}, {x: 0}, {x: 0}];
@@ -109,8 +109,8 @@ describe('ConnectFour Tests', () => {
     describe('#win game', () => {
 
         it('should win with four in one column', () => {
-            const playerOne = game.join();
-            const playerTwo = game.join();
+            const playerOne = game.join("");
+            const playerTwo = game.join("");
             
             const actionsPlayerOne = [{x: 0}, {x: 1}, {x: 0}, {x: 1}, {x: 0}, {x: 1}, {x: 0}];
             const actionsPlayerTwo = [{x: 2}, {x: 3}, {x: 2}, {x: 3}, {x: 2}, {x: 3}];
@@ -128,8 +128,8 @@ describe('ConnectFour Tests', () => {
         });
 
         it('should win with four in one row', () => {
-            const playerOne = game.join();
-            const playerTwo = game.join();
+            const playerOne = game.join("");
+            const playerTwo = game.join("");
             
             const actionsPlayerOne = [{x: 0}, {x: 1}, {x: 2}, {x: 3}];
             const actionsPlayerTwo = [{x: 0}, {x: 1}, {x: 2}];
@@ -147,8 +147,8 @@ describe('ConnectFour Tests', () => {
         });
 
         it('should win with four diagonal upwards', () => {
-            const playerOne = game.join();
-            const playerTwo = game.join();
+            const playerOne = game.join("");
+            const playerTwo = game.join("");
             
             const actionsPlayerOne = [{x: 0}, {x: 1}, {x: 2}, {x: 2}, {x: 3}, {x: 3}];
             const actionsPlayerTwo = [{x: 1}, {x: 2}, {x: 3}, {x: 3}, {x: 2}];
@@ -166,8 +166,8 @@ describe('ConnectFour Tests', () => {
         });
 
         it('should win with four diagonal downwards', () => {
-            const playerOne = game.join();
-            const playerTwo = game.join();
+            const playerOne = game.join("");
+            const playerTwo = game.join("");
             
             const actionsPlayerOne = [{x: 0}, {x: 3}, {x: 0}, {x: 1}, {x: 1}, {x: 2}];
             const actionsPlayerTwo = [{x: 0}, {x: 0}, {x: 1}, {x: 2}, {x: 1}];

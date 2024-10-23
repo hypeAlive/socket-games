@@ -146,7 +146,7 @@ export default class SocketRoom {
             playerId: playerId
         });
 
-        this.gameHandler.join(this.game, playerId);
+        this.gameHandler.join(this.game, clientData.name, playerId);
 
     }
 

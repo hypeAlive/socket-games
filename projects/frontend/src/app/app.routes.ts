@@ -3,6 +3,7 @@ import errorRoutes from './features/error/error.routes';
 import {GameResolver} from './features/join/services/game.resolver';
 import {JoinGuard} from './features/join/services/join.guard';
 import {NeedResolver} from './features/join/services/need.resolver';
+import {NameResolver} from './features/join/services/name.resolver';
 
 export const routes: Routes = [
   {
@@ -13,7 +14,8 @@ export const routes: Routes = [
     path: 'create',
     loadComponent: () => import('./features/join/pages/create/create.component'),
     resolve: {
-      game: GameResolver
+      game: GameResolver,
+      exampleName: NameResolver
     }
   },
   {
@@ -22,7 +24,8 @@ export const routes: Routes = [
     canMatch: [JoinGuard],
     resolve: {
       needs: NeedResolver,
-      game: GameResolver
+      game: GameResolver,
+      exampleName: NameResolver
     }
   },
   {

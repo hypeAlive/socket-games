@@ -3,7 +3,8 @@ import {NgForOf, NgIf} from '@angular/common';
 import {NgIcon, provideIcons} from '@ng-icons/core';
 import {hugePlusSign, hugeUser} from '@ng-icons/huge-icons';
 import {GameService} from '../../../../shared/services/game.service';
-import {GameData} from 'socket-game-types';
+import {GameData, PlayerData} from 'socket-game-types';
+import {GameInputBase} from '../../directives/game-input-base.directive';
 
 @Component({
   selector: 'app-lobby',
@@ -22,11 +23,10 @@ import {GameData} from 'socket-game-types';
     })
   ]
 })
-export class LobbyComponent {
-
-  @Input('gameData') gameData!: GameData;
+export class LobbyComponent extends GameInputBase<GameData, PlayerData>{
 
   constructor() {
+    super();
   }
 
   protected get minPlayers() {
@@ -38,8 +38,10 @@ export class LobbyComponent {
   }
 
   protected get players() {
-    return this.gameData.playerIds;
+    return this.gameData.players;
   }
+
+
 
 
 

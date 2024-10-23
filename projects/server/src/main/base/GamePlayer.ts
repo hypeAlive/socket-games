@@ -17,8 +17,9 @@ export default class GamePlayer<PD extends PlayerData> {
      * @param game - The game the player is in
      * @param initialPlayerData - The initial player data
      */
-    constructor(playerId: PlayerId, game: BaseGame<PD, any, any>, initialPlayerData: Partial<PD> = {}) {
+    constructor(playerId: PlayerId, playerName: string, game: BaseGame<PD, any, any>, initialPlayerData: Partial<PD> = {}) {
         this.playerData = {
+            name: playerName,
             playerId: playerId
         } as PD;
         this.game = game;
@@ -57,5 +58,9 @@ export default class GamePlayer<PD extends PlayerData> {
      */
     public getId(): PlayerId {
         return this.playerData.playerId;
+    }
+
+    public getName(): string {
+        return this.playerData.name;
     }
 }

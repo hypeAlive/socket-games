@@ -50,8 +50,8 @@ describe('TikTakToe Tests', () => {
     describe('emulate game', () => {
 
         it('run test game', async () => {
-            anyGame.join();
-            anyGame.join();
+            anyGame.join("");
+            anyGame.join("");
 
             const expectedBoard: (boolean | null)[][] = [
                 [null, null, null],

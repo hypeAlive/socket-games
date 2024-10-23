@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {NgIf} from '@angular/common';
 import {WindowComponent} from '../../components/window/window.component';
@@ -18,15 +18,17 @@ import {SocketJoin} from 'socket-game-types';
   templateUrl: './create.component.html',
   styles: []
 })
-export default class CreateComponent implements OnInit {
+export default class CreateComponent implements OnInit, AfterViewInit {
 
   protected createForm: FormGroup;
   private gameData!: CmsGame;
   protected isLoading: boolean = false;
+  private exampleName: string = 'Player';
 
   constructor(private fb: FormBuilder, private socket: GameService, private route: ActivatedRoute, private router: Router) {
     this.route.data.subscribe(data => {
       this.gameData = data['game'];
+      this.exampleName = data['exampleName'];
     });
     this.createForm = this.fb.group({
       username: ['', Validators.required],
@@ -63,6 +65,16 @@ export default class CreateComponent implements OnInit {
 
   protected get gameTitle(): string {
     return this.gameData.translations[0].title;
+  }
+
+  ngAfterViewInit(): void {
+    this.createForm.controls['username'].setValue(this.exampleName);
+  }
+
+  clearPlaceholder(): void {
+    if (this.createForm.controls['username'].value === this.exampleName) {
+      this.createForm.controls['username'].setValue('');
+    }
   }
 
 }

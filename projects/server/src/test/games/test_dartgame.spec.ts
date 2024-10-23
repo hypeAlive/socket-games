@@ -25,7 +25,7 @@ describe('Dart Tests', () => {
         });
         it('should initialize the points array with the correct player id for one player', () => {
             game.init(gameHandler, gameId);
-            let player = game.join();
+            let player = game.join("");
             game.start();
             expect(anyGame.getGameData().points).to.deep.equal([[player, 301]]);
         })
@@ -34,13 +34,13 @@ describe('Dart Tests', () => {
     describe('#points()', () => {
         it('should return points of player', () => {
             game.init(gameHandler, gameId);
-            let player = game.join();
+            let player = game.join("");
             game.start();
             expect(anyGame.getPoints(player)).to.equal(301);
         });
         it('should set points of player', () => {
             game.init(gameHandler, gameId);
-            let player = game.join();
+            let player = game.join("");
             game.start();
             anyGame.setPoints(player, 300);
             expect(anyGame.getPoints(player)).to.equal(300);
@@ -71,7 +71,7 @@ describe('Dart Tests', () => {
     describe('#isValidField()', () => {
         it('should check if field is possible with multiplier', () => {
             game.init(gameHandler, gameId);
-            game.join();
+            game.join("");
             game.start();
             expect(anyGame.isValidField(57)).to.be.true;
             expect(anyGame.isValidField(50)).to.be.true;
@@ -83,7 +83,7 @@ describe('Dart Tests', () => {
     describe('#Analyse Points of Player', () => {
         it('should check whether the player has 0 points and has won the game', () => {
             game.init(gameHandler, gameId);
-            let player = game.join();
+            let player = game.join("");
             game.start();
             anyGame.setPoints(player, 241);
             anyGame.setPoints(player, 181);
@@ -97,7 +97,7 @@ describe('Dart Tests', () => {
         });
         it('should trigger an error and not update the points if they fall below zero', () => {
             game.init(gameHandler, gameId);
-            let player = game.join();
+            let player = game.join("");
             game.start();
             anyGame.setPoints(player, 19);
             anyGame.handleAction(player, {field: {multiplier: 1, field: 20}});
