@@ -7,11 +7,12 @@ import {NgComponentOutlet, NgIf} from '@angular/common';
 import {LobbyComponent} from '../lobby/lobby.component';
 import {GameService} from '../../../../shared/services/game.service';
 import {Subscription} from 'rxjs';
-import {GameData, GameState, PlayerData} from 'socket-game-types';
+import {ConnectFourNamespace, GameData, GameState, PlayerData, TikTakToeNamespace} from 'socket-game-types';
 import {CmsGame} from '../../../home/models/games.interface';
 import {TikTakToeComponent} from '../tik-tak-toe/tik-tak-toe.component';
 import {CurrentTurnComponent} from '../../components/current-turn/current-turn.component';
 import {EndComponent} from '../end/end.component';
+import {ConnectFourComponent} from '../connect-four/connect-four.component';
 
 @Component({
   selector: 'app-game',
@@ -95,8 +96,10 @@ export default class GameComponent implements OnInit, OnDestroy {
 
   private getComponentFromGameKey(gameKey: string): Type<any> | null {
     switch (gameKey) {
-      case 'tiktaktoe':
+      case TikTakToeNamespace:
         return TikTakToeComponent;
+      case ConnectFourNamespace:
+        return ConnectFourComponent;
       default:
         return null;
     }

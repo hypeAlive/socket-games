@@ -8,6 +8,5 @@ export type ConnectFourGameData = GameData & {
 }
 
 export type ConnectFourAction = PlayerAction & {
-    x: number,
-    y: number
+    x: number
 }

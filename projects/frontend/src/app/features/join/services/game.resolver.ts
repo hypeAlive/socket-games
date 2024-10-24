@@ -29,7 +29,7 @@ export class GameResolver implements Resolve<Promise<CmsGame>> {
       this.logger.info('GameResolver', needs);
       return await this.directus
         .readItemWithTranslation<CmsGame>('games', {
-          _filter: {
+          filter: {
             unique_code: {
               _eq: needs.namespace
             }

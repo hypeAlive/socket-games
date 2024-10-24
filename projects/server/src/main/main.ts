@@ -8,6 +8,7 @@ import DartGame from "./games/DartGame.js";
 import {router as apiRouter} from "./api/api.js";
 import cors from "cors";
 import AuthUtil from "./utils/AuthUtil.js";
+import ConnectFourGame from "./games/ConnectFourGame.js";
 
 const LOGGER = LoggingUtils.createLogger("Server", "\x1b[34m");
 
@@ -44,7 +45,8 @@ LOGGER.info("verify " + AuthUtil.verifyPassword(hash, password));
 
 LOGGER.debug("Registering games...");
 gameHandler.register(TikTakToeGame.GAME_TYPE);
-gameHandler.register(DartGame.GAME_TYPE);
+gameHandler.register(ConnectFourGame.GAME_TYPE)
+//gameHandler.register(DartGame.GAME_TYPE);
 
 http.listen(PORT, () => {
     LOGGER.info(`Server started on port ${PORT} 🚀`);
