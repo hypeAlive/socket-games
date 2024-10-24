@@ -63,20 +63,6 @@ function generateServer() {
 }`;
 }
 
-function generateFallback() {
-    return `server {
-    if ($host = 0.0.0.0) {
-        return 301 https://$host$request_uri/;
-    }
-
-
-    server_name 0.0.0.0;
-
-    listen 80;
-    return 404;
-}`;
-}
-
 function generateNginxConfig() {
     const httpConfig = generateHttp();
 
@@ -85,7 +71,6 @@ function generateNginxConfig() {
 
 function generateDefaultConfig() {
     const serverConfig = generateServer();
-    const fallbackConfig = generateFallback();
 
     return `${serverConfig}`;
 }

@@ -10,6 +10,7 @@ export type PlayerId = [gameId: GameId, identifier: number];
  * Represents the data of a player.
  */
 export type PlayerData = {
+    name: string,
     playerId: PlayerId,
 }
 

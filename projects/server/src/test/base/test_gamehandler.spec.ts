@@ -163,18 +163,18 @@ describe('GameHandler Tests', () => {
         });
 
         it('should join a game', () => {
-            gameHandler.join(game.getId());
+            gameHandler.join(game.getId(), "");
 
             expect((game as any).players.length).to.equal(1);
         });
 
         it('should throw an error if game is not found while joining', () => {
             const fakeGameId: GameId = ['fakeGameId', 0];
-            expect(() => gameHandler.join(fakeGameId)).to.throw;
+            expect(() => gameHandler.join(fakeGameId, "")).to.throw;
         });
 
         it('should leave a game', () => {
-            const playerId = gameHandler.join(game.getId());
+            const playerId = gameHandler.join(game.getId(), "");
             expect((game as any).players.length).to.equal(1);
             gameHandler.leave(playerId);
             expect((game as any).players.length).to.equal(0);
@@ -194,8 +194,8 @@ describe('GameHandler Tests', () => {
         });
 
         it('should handle an action', () => {
-            gameHandler.join(game.getId());
-            gameHandler.join(game.getId());
+            gameHandler.join(game.getId(), "");
+            gameHandler.join(game.getId(), "");
             game.start();
             const playerId = anyGame.players[0].getId();
             expect(anyGame.receivedAction).to.be.false;
@@ -204,8 +204,8 @@ describe('GameHandler Tests', () => {
         });
 
         it('should next player', () => {
-            gameHandler.join(game.getId());
-            gameHandler.join(game.getId());
+            gameHandler.join(game.getId(), "");
+            gameHandler.join(game.getId(), "");
             game.start();
             const playerId1 = anyGame.players[0].getId();
             const playerId2 = anyGame.players[1].getId();

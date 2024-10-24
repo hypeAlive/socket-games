@@ -54,4 +54,22 @@ export default class UniqueId {
     private static getNumArray(ids: ID[]): number[] {
         return ids.map(id => typeof id === 'number' ? id : id[1]);
     }
+
+
+    public static generateUniqueHash(length: number = 4, existingHashes: IterableIterator<string>): string {
+        const existingHashesSet = new Set(existingHashes);
+        let hash = UniqueId.generateHash(length);
+        while (existingHashesSet.has(hash)) {
+            hash = UniqueId.generateHash(length);
+        }
+        return hash;
+    }
+
+    private static generateHash(length: number): string {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+        const charactersLength = characters.length;
+        const result = Array.from({ length }, () => characters.charAt(Math.floor(Math.random() * charactersLength)));
+        return result.join('');
+    }
+
 }

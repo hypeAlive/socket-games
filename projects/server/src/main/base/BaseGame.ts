@@ -61,6 +61,8 @@ export default abstract class BaseGame<PD extends PlayerData, GD extends GameDat
         this.gd = {
             gameId: gameId,
             state: this.state,
+            minPlayers: this.minPlayers,
+            maxPlayers: this.maxPlayers,
             playerIds: [],
             currentPlayerIndex: -1
         } as unknown as GD;
@@ -169,11 +171,14 @@ export default abstract class BaseGame<PD extends PlayerData, GD extends GameDat
      * @throws {GameError} - Thrown if the game is not initialized
      * @returns The generated player id
      */
-    public join(playerId?: PlayerId): PlayerId {
+    public join(playerName: string, playerId?: PlayerId): PlayerId {
         if (!this.isInitialized()) throw new GameError("Game not initialized");
 
+        if(this.players.length >= this.maxPlayers)
+            throw new GameError("Too many players: expected " + this.maxPlayers + "- but got " + this.players.length);
+
         playerId = playerId ? playerId : this.createPlayerId();
-        const player = new GamePlayer(playerId, this, this.initialPlayerData);
+        const player = new GamePlayer(playerId, playerName, this, this.initialPlayerData);
         this.players.push(player);
 
         this.gameHandler.next({
@@ -493,7 +498,11 @@ export default abstract class BaseGame<PD extends PlayerData, GD extends GameDat
         if (!this.gd) throw new GameError("Game not initialized");
         return {
             ...this.gd,
-            playerIds: this.players.map(player => player.getId())
+            playerIds: this.players.map(player => player.getId()),
+            players: this.players.map(player => ({
+                name: player.getName(),
+                playerId: player.getId()
+            }))
         };
     }
 

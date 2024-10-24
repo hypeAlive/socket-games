@@ -1,0 +1,19 @@
+<div class="container mx-auto py-12 flex justify-center">
+  <div class="bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-10 max-w-md mx-auto text-center">
+    <h2 class="text-3xl font-semibold mb-2 text-gray-900 dark:text-white">{{ gameTitle }}</h2>
+    <h3 class="text-2xl font-semibold mb-8 text-gray-900 dark:text-white">Game Over</h3>
+    <p class="text-2xl mb-8" [ngClass]="{'text-green-500': winner === 'You', 'text-red-500': winner !== 'You'}">
+      🎉🎇 {{ myWin ? 'You have won!' : winner + ' wins!' }} 🎇🎉
+    </p>
+    <div *ngIf="this.isOwner(); else waitMessage" class="flex justify-center">
+      <button (click)="startNewGame()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        Rematch!
+      </button>
+    </div>
+    <ng-template #waitMessage>
+      <p class="text-xl text-gray-700 dark:text-gray-300">
+        Please wait for the game owner to start a new round.
+      </p>
+    </ng-template>
+  </div>
+</div>

@@ -54,11 +54,12 @@ export default class GameHandler {
      * Joins a player to a game instance, generating a new player id.
      *
      * @param gameId - The id of the game instance.
+     * @param playerId
      * @returns The id of the player that joined the game.
      */
-    public join(gameId: GameId, playerId?: PlayerId): PlayerId {
+    public join(gameId: GameId, playerName: string, playerId?: PlayerId): PlayerId {
         return this.getGameById(gameId)
-            .map(game => game.join(playerId))
+            .map(game => game.join(playerName, playerId))
             .orElseThrow("Game not found");
     }
 
@@ -111,7 +112,7 @@ export default class GameHandler {
      * @returns True if the game type is registered, otherwise false.
      * @private
      */
-    private isRegistered(param: string | GameType<any, any, any>): boolean {
+    public isRegistered(param: string | GameType<any, any, any>): boolean {
         if (typeof param === 'string') return this.registered.has(param);
 
         return this.registered.has(param.namespace);

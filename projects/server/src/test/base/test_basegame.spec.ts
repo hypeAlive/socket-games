@@ -60,8 +60,8 @@ describe('BaseGame Tests', () => {
     describe('#start()', () => {
         it('should start the game', () => {
             game.init(gameHandler, gameId);
-            game.join();
-            game.join();
+            game.join("");
+            game.join("");
             game.start();
             expect(game.getState()).to.equal(GameState.RUNNING);
         });
@@ -84,7 +84,7 @@ describe('BaseGame Tests', () => {
 
                 // Join multiple players to ensure shuffling can occur
                 for (let j = 0; j < 5; j++) {
-                    game.join();
+                    game.join("");
                 }
 
                 const playerIds: PlayerId[] = anyGame.players.map((player: GamePlayer<any>) => player.getId());
@@ -106,8 +106,8 @@ describe('BaseGame Tests', () => {
 
         it('should end the game', () => {
             game.init(gameHandler, gameId);
-            game.join();
-            game.join();
+            game.join("");
+            game.join("");
             game.start();
             (game as any).end();
             expect(game.getState()).to.equal(GameState.ENDED);
@@ -121,8 +121,8 @@ describe('BaseGame Tests', () => {
 
         it('should delete the game from the game handler', () => {
             game.init(gameHandler, gameId);
-            game.join();
-            game.join();
+            game.join("");
+            game.join("");
             game.start();
             (game as any).end();
             expect(gameHandler.getRunningGames(TestableGameNamespace)).to.be.deep.equal([]);
@@ -136,8 +136,8 @@ describe('BaseGame Tests', () => {
             });
             let result = false;
             game.init(gameHandler, gameId);
-            game.join();
-            game.join();
+            game.join("");
+            game.join("");
             game.start();
             const sub = gameHandler.subscribe((event: GameEvent<GameData>) => {
                 result = event.data.winnerId === (game as any).players[0].getId();
@@ -162,7 +162,7 @@ describe('BaseGame Tests', () => {
             game.init(gameHandler, gameId);
             anyGame = game;
             for(let i = 0; i < 5; i++){
-                game.join();
+                game.join("");
             }
         });
 
@@ -278,7 +278,7 @@ describe('BaseGame Tests', () => {
         it('should change the player order', () => {
             game.init(gameHandler, gameId);
             for (let i = 0; i < 5; i++) {
-                game.join();
+                game.join("");
             }
             game.start();
             const playerIds: PlayerId[] = anyGame.players.map((player: GamePlayer<PlayerData>) => player.getId());
@@ -293,7 +293,7 @@ describe('BaseGame Tests', () => {
         it('should not change the current player', () => {
             game.init(gameHandler, gameId);
             for (let i = 0; i < 5; i++) {
-                game.join();
+                game.join("");
             }
             game.start();
             const playerIds: PlayerId[] = anyGame.players.map((player: GamePlayer<PlayerData>) => player.getId());
@@ -318,7 +318,7 @@ describe('BaseGame Tests', () => {
 
         it('should check if the game has been won', () => {
             game.init(gameHandler, gameId);
-            game.join();
+            game.join("");
             game.start();
             expect(game.getState()).to.equal(GameState.ENDED);
         });
@@ -326,8 +326,8 @@ describe('BaseGame Tests', () => {
         it('should change to next current player', () => {
             const anyGame: any = game;
             game.init(gameHandler, gameId);
-            game.join();
-            game.join();
+            game.join("");
+            game.join("");
             game.start();
             const playerIds: PlayerId[] = (game as any).players
                 .map((player: GamePlayer<any>) => player.getId());

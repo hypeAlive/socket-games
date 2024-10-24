@@ -1,2 +1,4 @@
 <game-chat-sidebar/>
-<ng-container *ngComponentOutlet="gameComponent.component"/>
+<game-current-turn *ngIf="this.isGameState(GameState.RUNNING) && this.gameData && this.playerData"
+                   [gameData]="this.gameData" [playerData]="this.playerData"/>
+<ng-container *ngComponentOutlet="gameComponent.component; inputs: gameComponent.inputs"/>

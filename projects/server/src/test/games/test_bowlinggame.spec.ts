@@ -23,7 +23,7 @@ describe('Bowling Tests', () => {
         });
         it('should initialize the frames array with the correct player id for one player', () => {
             game.init(gameHandler, gameId);
-            let player = game.join();
+            let player = game.join("");
             game.start();
             expect(anyGame.getGameData().frames).to.deep.equal([[player, []]]);
             expect(anyGame.getGameData().currentFrame).to.deep.equal(0);
