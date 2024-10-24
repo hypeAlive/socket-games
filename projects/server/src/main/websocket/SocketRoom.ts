@@ -286,7 +286,11 @@ export default class SocketRoom {
 
     public leave(client: any) {
         try {
-            this.leaveGame(client.id);
+            try {
+                this.leaveGame(client.id);
+            } catch (e) {
+                LOGGER.error(e);
+            }
             const data = this.removeClientData(client.id);
             if(data) {
                 this.sendSystemMessage(`${data.name} left the room 👤`);
